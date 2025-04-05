@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: '1743813005133'
+      author: Spring Data Relational
+      objectQuotingStrategy: LEGACY
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: true
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: true
+                  name: published_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_daily
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: true
+                  name: cubes
+                  type: JSON
+            schemaName: lexicubesdb
+            tableName: puzzles
+
