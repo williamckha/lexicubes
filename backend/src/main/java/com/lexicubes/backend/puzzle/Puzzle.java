@@ -1,6 +1,7 @@
 package com.lexicubes.backend.puzzle;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
@@ -14,8 +15,8 @@ import java.util.stream.Stream;
 public class Puzzle {
 
     /**
-     * We use a right-hand coordinate system, where the x-axis is pointing right, the
-     * y-axis is pointing up, and the z-axis is pointing out of the screen (or "left").
+     * We use a right-hand coordinate system, where the x-axis is pointing "right" (southeast),
+     * the y-axis is pointing up, and the z-axis is pointing "left" (southwest).
      * <p>
      * The puzzle is viewed in isometric perspective, so each cube only has three visible
      * faces (top, left, and right).
@@ -221,6 +222,7 @@ public class Puzzle {
     public record Cubes(List<Cube> list) {}
 
     @Id
+    @Nullable
     private final Long id;
 
     private final LocalDate publishedDate;
@@ -249,7 +251,7 @@ public class Puzzle {
         return new Puzzle(null, publishedDate, isDaily, new Cubes(cubes));
     }
 
-    public Puzzle(Long id, LocalDate publishedDate, boolean isDaily, Cubes cubes) {
+    public Puzzle(@Nullable Long id, LocalDate publishedDate, boolean isDaily, Cubes cubes) {
         if (cubes.list().stream().map(Cube::getId).distinct().count() != cubes.list().size()) {
             throw new IllegalArgumentException("Cube IDs must be unique");
         }
@@ -274,7 +276,7 @@ public class Puzzle {
         resolveNeighboursForCubeFaces();
     }
 
-    public Long getId() {
+    public @Nullable Long getId() {
         return id;
     }
 
