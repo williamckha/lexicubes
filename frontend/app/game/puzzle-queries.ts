@@ -49,5 +49,9 @@ export function usePuzzleQuery(puzzleId: PuzzleQueryId) {
 
 async function fetchPuzzle(puzzleId: PuzzleQueryId): Promise<Puzzle> {
   const response = await fetch(`${import.meta.env.VITE_BACKEND_API_BASE_URL}/puzzles/${puzzleId}`);
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${response.status} ${response.statusText}: ${text}`);
+  }
   return response.json();
 }
