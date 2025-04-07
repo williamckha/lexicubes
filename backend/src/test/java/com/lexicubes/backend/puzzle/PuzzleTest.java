@@ -1,5 +1,7 @@
 package com.lexicubes.backend.puzzle;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -195,5 +197,27 @@ public class PuzzleTest {
                 .toList();
 
         assertEquals(faceIds.size(), faceIds.stream().distinct().count());
+    }
+
+    @Test
+    public void threeByThreePuzzleCubes_shouldBeJsonSerializableAndDeserializable() throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+
+        final Puzzle.Cubes cubes = new Puzzle.Cubes(threeByThreePuzzle.getCubes());
+        final String json = mapper.writeValueAsString(cubes);
+        final Puzzle.Cubes deserializedCubes = mapper.readValue(json, Puzzle.Cubes.class);
+
+        final List<Puzzle.Cube.Face> allFaces = cubes.list().stream()
+                .flatMap(cube -> Stream.of(cube.getTopFace(), cube.getLeftFace(), cube.getRightFace()))
+                .toList();
+
+        final List<Puzzle.Cube.Face> allDeserializedFaces = deserializedCubes.list().stream()
+                .flatMap(cube -> Stream.of(cube.getTopFace(), cube.getLeftFace(), cube.getRightFace()))
+                .toList();
+
+        assertEquals(cubes, deserializedCubes);
+        assertEquals(allFaces.stream().map(Puzzle.Cube.Face::getCube).toList(),
+                allDeserializedFaces.stream().map(Puzzle.Cube.Face::getCube).toList());
     }
 }

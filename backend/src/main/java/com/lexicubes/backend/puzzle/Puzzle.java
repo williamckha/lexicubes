@@ -1,6 +1,6 @@
 package com.lexicubes.backend.puzzle;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -15,14 +15,24 @@ import java.util.stream.Stream;
 public class Puzzle {
 
     /**
+     * Represents a cube at some coordinate in a puzzle.
+     * <p>
      * We use a right-hand coordinate system, where the x-axis is pointing "right" (southeast),
      * the y-axis is pointing up, and the z-axis is pointing "left" (southwest).
      * <p>
      * The puzzle is viewed in isometric perspective, so each cube only has three visible
      * faces (top, left, and right).
      */
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id",
+            scope = Puzzle.Cube.class)
     public static class Cube {
 
+        @JsonIdentityInfo(
+                generator = ObjectIdGenerators.PropertyGenerator.class,
+                property = "id",
+                scope = Puzzle.Cube.Face.class)
         public static class Face {
 
             private record Edge(Point start, Point end) {
@@ -50,18 +60,15 @@ public class Puzzle {
                             new Edge.Point(1, 0, 0),
                             new Edge.Point(1, 0, 1),
                             new Edge.Point(1, 1, 1),
-                            new Edge.Point(1, 1, 0))
-            );
+                            new Edge.Point(1, 1, 0)));
 
             private final int id;
 
             private final char letter;
 
-            @JsonIgnore
             private final Side side;
 
-            @JsonIgnore
-            private final Cube cube;
+            private Cube cube;
 
             @JsonIgnore
             private final List<Edge> edges;
@@ -69,17 +76,25 @@ public class Puzzle {
             @JsonIgnore
             private final Set<Face> neighbours;
 
-            private Face(Cube cube, Side side, char letter) {
+            @JsonCreator
+            private Face(@JsonProperty int id,
+                         @JsonProperty char letter,
+                         @JsonProperty Side side) {
+
                 if (letter < 'a' || letter > 'z') {
                     throw new IllegalArgumentException("Face letter must be lowercase");
                 }
 
-                this.id = cube.getId() * Side.values().length + side.ordinal();
+                this.id = id;
                 this.letter = letter;
                 this.side = side;
-                this.cube = cube;
-                this.edges = getEdges();
+                this.edges = new ArrayList<>();
                 this.neighbours = new HashSet<>();
+            }
+
+            private Face(Cube cube, Side side, char letter) {
+                this(cube.getId() * Side.values().length + side.ordinal(), letter, side);
+                setCube(cube);
             }
 
             public int getId() {
@@ -90,8 +105,28 @@ public class Puzzle {
                 return letter;
             }
 
+            public Side getSide() {
+                return side;
+            }
+
             public Cube getCube() {
                 return cube;
+            }
+
+            private void setCube(Cube cube) {
+                this.cube = cube;
+
+                final List<Edge.Point> vertices = FACE_VERTICES.get(side).stream()
+                        .map(point -> new Edge.Point(
+                                point.x() + cube.getX(),
+                                point.y() + cube.getY(),
+                                point.z() + cube.getZ()))
+                        .toList();
+
+                edges.clear();
+                for (int i = 0; i < vertices.size(); i++) {
+                    edges.add(new Edge(vertices.get(i), vertices.get((i + 1) % vertices.size())));
+                }
             }
 
             public Set<Face> getNeighbours() {
@@ -102,29 +137,16 @@ public class Puzzle {
                 neighbours.add(neighbour);
             }
 
-            private List<Edge> getEdges() {
-                final List<Edge.Point> vertices = FACE_VERTICES.get(side).stream()
-                        .map(point -> new Edge.Point(
-                                point.x() + cube.getX(),
-                                point.y() + cube.getY(),
-                                point.z() + cube.getZ()))
-                        .toList();
-
-                final List<Edge> edges = new ArrayList<>();
-                for (int i = 0; i < vertices.size(); i++) {
-                    edges.add(new Edge(vertices.get(i), vertices.get((i + 1) % vertices.size())));
-                }
-
-                return Collections.unmodifiableList(edges);
-            }
-
             private boolean isTouching(Face face) {
                 return edges.stream().anyMatch(edge -> face.edges.stream().anyMatch(edge::isTouching));
             }
 
             @Override
             public boolean equals(Object obj) {
-                return obj instanceof Face other && id == other.id;
+                return obj instanceof Face other &&
+                        id == other.id &&
+                        letter == other.letter &&
+                        side == other.side;
             }
 
             @Override
@@ -133,7 +155,7 @@ public class Puzzle {
             }
         }
 
-        private enum Side {
+        public enum Side {
             TOP, LEFT, RIGHT
         }
 
@@ -147,9 +169,30 @@ public class Puzzle {
         private final Face leftFace;
         private final Face rightFace;
 
+        @JsonCreator
+        private Cube(@JsonProperty int id,
+                     @JsonProperty int x,
+                     @JsonProperty int y,
+                     @JsonProperty int z) {
+
+            this.id = id;
+
+            this.x = x;
+            this.y = y;
+            this.z = z;
+
+            this.topFace = null;
+            this.leftFace = null;
+            this.rightFace = null;
+        }
+
         public Cube(int id,
-                    int x, int y, int z,
-                    char topFaceLetter, char leftFaceLetter, char rightFaceLetter) {
+                    int x,
+                    int y,
+                    int z,
+                    char topFaceLetter,
+                    char leftFaceLetter,
+                    char rightFaceLetter) {
 
             if (x < 0 || y < 0 || z < 0) {
                 throw new IllegalArgumentException("Cube coordinates must be non-negative");
@@ -205,7 +248,14 @@ public class Puzzle {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Cube other && id == other.id;
+            return obj instanceof Cube other &&
+                    id == other.id &&
+                    x == other.x &&
+                    y == other.y &&
+                    z == other.z &&
+                    Objects.equals(topFace, other.topFace) &&
+                    Objects.equals(leftFace, other.leftFace) &&
+                    Objects.equals(rightFace, other.rightFace);
         }
 
         @Override

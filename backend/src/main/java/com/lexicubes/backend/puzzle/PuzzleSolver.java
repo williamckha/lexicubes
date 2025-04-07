@@ -113,21 +113,25 @@ public class PuzzleSolver {
         if (!cubesBlockingFace.containsKey(face)) {
             final Puzzle.Cube cube = face.getCube();
             final Set<Puzzle.Cube> cubes = new HashSet<>();
-            if (cube.getTopFace() == face) {
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ());
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ());
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
-            } else if (cube.getLeftFace() == face) {
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY(), cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ() + 1);
-            } else if (cube.getRightFace() == face) {
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ());
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
-                getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ());
+            switch (face.getSide()) {
+                case TOP -> {
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ());
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ());
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
+                }
+                case LEFT -> {
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY(), cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX(), cube.getY() + 1, cube.getZ() + 1);
+                }
+                case RIGHT -> {
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ());
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY(), cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ() + 1);
+                    getCubesRenderedAtCoordinate(puzzle, cubes, cube.getX() + 1, cube.getY() + 1, cube.getZ());
+                }
             }
             cubesBlockingFace.put(face, Set.copyOf(cubes));
         }
