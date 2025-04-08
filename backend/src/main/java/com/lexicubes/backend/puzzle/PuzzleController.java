@@ -1,9 +1,14 @@
 package com.lexicubes.backend.puzzle;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +17,15 @@ import java.util.Optional;
 public class PuzzleController {
 
     private final PuzzleRepository puzzleRepository;
+    private final PuzzleGenerator puzzleGenerator;
     private final PuzzleSolver puzzleSolver;
 
-    public PuzzleController(PuzzleRepository puzzleRepository, PuzzleSolver puzzleSolver) {
+    public PuzzleController(PuzzleRepository puzzleRepository,
+                            PuzzleGenerator puzzleGenerator,
+                            PuzzleSolver puzzleSolver) {
+
         this.puzzleRepository = puzzleRepository;
+        this.puzzleGenerator = puzzleGenerator;
         this.puzzleSolver = puzzleSolver;
     }
 
@@ -31,9 +41,9 @@ public class PuzzleController {
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
     }
 
-    @GetMapping("/puzzles/daily")
-    public PuzzleResponse getDailyPuzzle() {
-        final Optional<Puzzle> puzzle = puzzleRepository.findByPublishedDate(LocalDate.now());
+    @GetMapping("/puzzles/daily/{date}")
+    public PuzzleResponse getDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        final Optional<Puzzle> puzzle = puzzleRepository.findDailyByPublishedDate(date);
         if (puzzle.isEmpty()) {
             throw new PuzzleNotFoundException();
         }
@@ -41,5 +51,18 @@ public class PuzzleController {
         final List<PuzzleSolver.PuzzleSolution> solutions = puzzleSolver.solve(puzzle.get());
 
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
+    }
+
+    @PutMapping("/puzzles/daily/{date}")
+    public ResponseEntity<?> generateDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        final Puzzle puzzle = puzzleGenerator.generateAndSaveDailyPuzzle(date);
+
+        final URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/puzzles/{id}")
+                .buildAndExpand(puzzle.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 }

@@ -16,11 +16,11 @@ public interface PuzzleRepository extends CrudRepository<Puzzle, Long> {
     @Caching(evict = {
             @CacheEvict(
                     cacheNames = "puzzle",
-                    key = "#entity.id"),
+                    key = "#result.id"),
             @CacheEvict(
                     cacheNames = "dailyPuzzleByPublishedDate",
-                    key = "#entity.publishedDate",
-                    condition = "#entity.daily")
+                    key = "#result.publishedDate",
+                    condition = "#result.daily")
     })
     <S extends Puzzle> @NotNull S save(@NotNull S entity);
 

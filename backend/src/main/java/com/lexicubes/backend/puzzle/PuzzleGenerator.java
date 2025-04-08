@@ -1,11 +1,11 @@
 package com.lexicubes.backend.puzzle;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class PuzzleGenerator {
@@ -50,7 +50,13 @@ public class PuzzleGenerator {
         random = new Random();
     }
 
-    public Puzzle generatePuzzle(int size) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Puzzle generateAndSaveDailyPuzzle(LocalDate date) {
+        final Optional<Puzzle> existingPuzzle = puzzleRepository.findDailyByPublishedDate(date);
+        return existingPuzzle.orElseGet(() -> puzzleRepository.save(Puzzle.of(date, true, generatePuzzleCubes(3))));
+    }
+
+    public List<Puzzle.Cube> generatePuzzleCubes(int size) {
         final int numCubes = size * size * size;
         final List<Puzzle.Cube> cubes = new ArrayList<>(numCubes);
 
@@ -64,7 +70,7 @@ public class PuzzleGenerator {
             }
         }
 
-        return Puzzle.of(cubes);
+        return cubes;
     }
 
     private char getRandomLetter() {

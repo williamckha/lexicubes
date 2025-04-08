@@ -48,10 +48,15 @@ export function usePuzzleQuery(puzzleId: PuzzleQueryId) {
 }
 
 async function fetchPuzzle(puzzleId: PuzzleQueryId): Promise<Puzzle> {
-  const response = await fetch(`${import.meta.env.VITE_BACKEND_API_BASE_URL}/puzzles/${puzzleId}`);
+  const url = `${import.meta.env.VITE_BACKEND_API_BASE_URL}/puzzles/
+    ${puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId}`;
+
+  const response = await fetch(url);
+
   if (!response.ok) {
     const text = await response.text();
     throw new Error(`${response.status} ${response.statusText}: ${text}`);
   }
+
   return response.json();
 }

@@ -46,7 +46,7 @@ public class PuzzleSolver {
         dependentWords = new HashSet<>();
     }
 
-    @Cacheable(cacheNames = "puzzleSolutions", key = "#puzzle.id")
+    @Cacheable(cacheNames = "puzzleSolutions", key = "#puzzle.id", unless = "#puzzle.id == null")
     public List<PuzzleSolution> solve(Puzzle puzzle) {
         path.clear();
         unusableCubes.clear();
