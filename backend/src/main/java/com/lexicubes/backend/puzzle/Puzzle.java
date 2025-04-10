@@ -11,14 +11,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A puzzle is viewed in isometric perspective and consists of cubes. Each cube has a
+ * letter on each of its sides. The objective of the puzzle is to form words by connecting
+ * neighbouring letters.
+ * <p>
+ * We use a right-hand coordinate system, where the x-axis is pointing "right" (southeast),
+ * the y-axis is pointing up, and the z-axis is pointing "left" (southwest).
+ */
 @Table("puzzles")
 public class Puzzle {
 
     /**
      * Represents a cube at some coordinate in a puzzle.
-     * <p>
-     * We use a right-hand coordinate system, where the x-axis is pointing "right" (southeast),
-     * the y-axis is pointing up, and the z-axis is pointing "left" (southwest).
      * <p>
      * The puzzle is viewed in isometric perspective, so each cube only has three visible
      * faces (top, left, and right).
@@ -226,21 +231,21 @@ public class Puzzle {
         }
 
         /**
-         * @return the top face (positive Y side) of the cube
+         * {@return the top face (positive Y side) of the cube}
          */
         public Face getTopFace() {
             return topFace;
         }
 
         /**
-         * @return the left face (positive Z side) of the cube
+         * {@return the left face (positive Z side) of the cube}
          */
         public Face getLeftFace() {
             return leftFace;
         }
 
         /**
-         * @return the right face (positive X side) of the cube
+         * {@return the right face (positive X side) of the cube}
          */
         public Face getRightFace() {
             return rightFace;
@@ -268,6 +273,9 @@ public class Puzzle {
      * Wrapper around a list of {@link Cube}s.
      * This is necessary to prevent Spring Data from inferring a one-to-many relationship,
      * forcing usage of our custom converter that serializes the cubes to JSON.
+     *
+     * @see com.lexicubes.backend.puzzle.converters.PuzzleCubesToJsonConverter
+     * @see com.lexicubes.backend.puzzle.converters.JsonToPuzzleCubesConverter
      */
     public record Cubes(List<Cube> list) {}
 
