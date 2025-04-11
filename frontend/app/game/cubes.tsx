@@ -219,9 +219,9 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
           className={`flex flex-1 items-center
                     ${CUBE_FACE_CONSTANTS.INNER_ROTATION[orientation]}`}
         >
-          <p className={`flex-1 text-center font-bold`} style={{ fontSize: size / 2 }}>
+          <span className={`flex-1 text-center font-bold`} style={{ fontSize: size / 2 }}>
             {face.letter.toUpperCase()}
-          </p>
+          </span>
         </div>
       </div>
     </div>

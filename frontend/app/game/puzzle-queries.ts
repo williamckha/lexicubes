@@ -48,8 +48,8 @@ export function usePuzzleQuery(puzzleId: PuzzleQueryId) {
 }
 
 async function fetchPuzzle(puzzleId: PuzzleQueryId): Promise<Puzzle> {
-  const url = `${import.meta.env.VITE_BACKEND_API_BASE_URL}/puzzles/
-    ${puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId}`;
+  const url =
+    "/api/puzzles/" + (puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId);
 
   const response = await fetch(url);
 

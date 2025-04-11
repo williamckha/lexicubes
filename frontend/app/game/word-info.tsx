@@ -15,20 +15,22 @@ export function WordInfo() {
   return (
     <div className="h-20 flex justify-center items-center">
       {currentWord.length > 0 && (
-        <p
+        <span
           className={`text-4xl font-bold 
                       ${currentWord.length < MIN_WORD_LENGTH ? "opacity-50" : ""}`}
         >
           {currentWord.toUpperCase()}
-        </p>
+        </span>
       )}
       {isWordInfoAvailable && wordInfo.status === "success" && (
-        <p className="text-4xl font-bold text-amber-600 animate-word-info-fade-in-out">Congrats</p>
+        <span className="text-4xl font-bold text-amber-600 animate-word-info-fade-in-out">
+          Congrats
+        </span>
       )}
       {isWordInfoAvailable && wordInfo.status !== "success" && (
-        <p className="text-4xl font-bold animate-word-info-fade-in-out">
+        <span className="text-4xl font-bold animate-word-info-fade-in-out">
           {WORD_INFO_MESSAGES[wordInfo.status]}
-        </p>
+        </span>
       )}
       {isWordInfoAvailable &&
         (wordInfo.status === "success" || wordInfo.status === "alreadyFound") && (

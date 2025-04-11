@@ -147,3 +147,11 @@ html, body {
         @apply bg-background text-foreground;
     }
 }
+
+h2 {
+    @apply text-xl font-semibold
+}
+
+b {
+    @apply font-semibold
+}

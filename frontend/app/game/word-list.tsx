@@ -57,7 +57,7 @@ export function WordList({ puzzle }: WordListProps) {
         .sort()
         .map(([numLetters, words]) => (
           <div key={numLetters} className="flex flex-col gap-2">
-            <h1 className="text-xl font-semibold">{`${numLetters} letters`}</h1>
+            <h2>{`${numLetters} letters`}</h2>
             <div className="flex flex-wrap gap-x-3 gap-y-1 empty:hidden">
               {words
                 .filter((word) => sortWordsAlphabetically || showSomeLetters || word.found)

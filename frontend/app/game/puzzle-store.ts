@@ -212,7 +212,7 @@ function isCoordinateWithinPuzzleBounds(puzzle: Puzzle, x: number, y: number, z:
 function getCubesBlockingFace(puzzle: Puzzle, face: PuzzleCubeFace): PuzzleCube[] {
   const cubesBlockingFace = new Set<PuzzleCube>();
 
-  function getCubesRenderedAtCoordinate(x: number, y: number, z: number) {
+  function getCubesBlockingCoordinate(x: number, y: number, z: number) {
     for (let i = 0; isCoordinateWithinPuzzleBounds(puzzle, x + i, y + i, z + i); i++) {
       const cube = puzzle.cubes.find(
         (cube) => cube.x === x + i && cube.y === y + i && cube.z === z + i,
@@ -225,20 +225,20 @@ function getCubesBlockingFace(puzzle: Puzzle, face: PuzzleCubeFace): PuzzleCube[
 
   const cube = getCubeWithFace(puzzle, face);
   if (cube.topFace.id === face.id) {
-    getCubesRenderedAtCoordinate(cube.x, cube.y + 1, cube.z);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y + 1, cube.z);
-    getCubesRenderedAtCoordinate(cube.x, cube.y + 1, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x, cube.y + 1, cube.z);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y + 1, cube.z);
+    getCubesBlockingCoordinate(cube.x, cube.y + 1, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
   } else if (cube.leftFace.id === face.id) {
-    getCubesRenderedAtCoordinate(cube.x, cube.y, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x, cube.y + 1, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x, cube.y, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x, cube.y + 1, cube.z + 1);
   } else if (cube.rightFace.id === face.id) {
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y, cube.z);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
-    getCubesRenderedAtCoordinate(cube.x + 1, cube.y + 1, cube.z);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y, cube.z);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y + 1, cube.z + 1);
+    getCubesBlockingCoordinate(cube.x + 1, cube.y + 1, cube.z);
   }
 
   return Array.from(cubesBlockingFace);

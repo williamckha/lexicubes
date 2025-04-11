@@ -37,9 +37,7 @@ export function Game({ puzzle }: GameProps) {
               <DialogDescription>Word list for the current puzzle</DialogDescription>
             </VisuallyHidden>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto">
-            <WordList puzzle={puzzle} />
-          </div>
+          <WordList puzzle={puzzle} />
         </DialogContent>
       </Dialog>
     </div>
