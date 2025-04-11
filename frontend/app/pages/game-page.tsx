@@ -33,7 +33,7 @@ export function GamePage({ puzzleId }: GamePageProps) {
 
   return (
     <div className="flex flex-1 justify-center items-stretch flex-col">
-      <header className="flex justify-center border-b-1 shadow-lg">
+      <header className="flex justify-center bg-tile-selected border-b-2 shadow-lg">
         <div className="flex flex-1 justify-center items-center max-w-200 mx-4">
           <div className="flex flex-1 justify-start items-center">
             <HeaderButton>
@@ -75,5 +75,5 @@ export function GamePage({ puzzleId }: GamePageProps) {
 }
 
 function HeaderButton({ children }: React.PropsWithChildren) {
-  return <div className="hover:bg-muted px-2 py-3 cursor-pointer">{children}</div>;
+  return <div className="hover:bg-white/30 px-2 py-3 cursor-pointer">{children}</div>;
 }
