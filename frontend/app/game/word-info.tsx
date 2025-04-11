@@ -1,4 +1,9 @@
-import { MIN_WORD_LENGTH, usePuzzleCurrentWord, usePuzzleWordInfo } from "~/game/puzzle-store";
+import {
+  getNumberOfPointsForWord,
+  MIN_WORD_LENGTH,
+  usePuzzleCurrentWord,
+  usePuzzleWordInfo,
+} from "~/game/puzzle-store";
 
 const WORD_INFO_MESSAGES = {
   tooShort: "Too short",
@@ -16,26 +21,26 @@ export function WordInfo() {
     <div className="h-20 flex justify-center items-center">
       {currentWord.length > 0 && (
         <span
-          className={`text-4xl font-bold 
+          className={`text-3xl sm:text-4xl font-bold 
                       ${currentWord.length < MIN_WORD_LENGTH ? "opacity-50" : ""}`}
         >
           {currentWord.toUpperCase()}
         </span>
       )}
       {isWordInfoAvailable && wordInfo.status === "success" && (
-        <span className="text-4xl font-bold text-amber-600 animate-word-info-fade-in-out">
-          Congrats
+        <span className="text-3xl sm:text-4xl font-bold text-amber-600 animate-word-info-fade-in-out">
+          +{getNumberOfPointsForWord(wordInfo.word)} points
         </span>
       )}
       {isWordInfoAvailable && wordInfo.status !== "success" && (
-        <span className="text-4xl font-bold animate-word-info-fade-in-out">
+        <span className="text-3xl sm:text-4xl font-bold animate-word-info-fade-in-out">
           {WORD_INFO_MESSAGES[wordInfo.status]}
         </span>
       )}
       {isWordInfoAvailable &&
         (wordInfo.status === "success" || wordInfo.status === "alreadyFound") && (
           <div
-            className="absolute text-3xl font-bold p-2 bg-card text-center border-2
+            className="absolute text-2xl sm:text-3xl font-bold p-2 bg-card text-center border-2
                        animate-word-definition-fade-in"
           >
             {wordInfo.word.toLowerCase()}

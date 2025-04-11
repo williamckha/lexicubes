@@ -25,7 +25,7 @@ export function Game({ puzzle }: GameProps) {
   initializePuzzleStateIfAbsent(puzzle);
 
   return (
-    <div className="flex justify-start items-center flex-col gap-6">
+    <div className="flex justify-start items-center flex-col gap-2 sm:gap-4">
       <ScoreInfo puzzle={puzzle} onWordCountClick={() => setIsWordListDialogOpen(true)} />
       <WordInfo />
       <Cubes puzzle={puzzle} />

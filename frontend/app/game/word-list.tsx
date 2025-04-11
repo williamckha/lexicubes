@@ -1,7 +1,8 @@
-import { usePuzzleFoundWords } from "~/game/puzzle-store";
+import { usePuzzleFoundWords, usePuzzleScore } from "~/game/puzzle-store";
 import { useState } from "react";
 import { Checkbox } from "~/components/ui/checkbox";
 import type { Puzzle } from "~/game/puzzle-queries";
+import { PERK_SCORES } from "~/game/game-constants";
 
 interface WordListProps {
   puzzle: Puzzle;
@@ -9,6 +10,7 @@ interface WordListProps {
 
 export function WordList({ puzzle }: WordListProps) {
   const foundWords = usePuzzleFoundWords(puzzle.id);
+  const puzzleScore = usePuzzleScore(puzzle.id);
 
   const [sortWordsAlphabetically, setSortWordsAlphabetically] = useState(false);
   const [showSomeLetters, setShowSomeLetters] = useState(false);
@@ -50,6 +52,7 @@ export function WordList({ puzzle }: WordListProps) {
         <Checkbox
           checked={showSomeLetters}
           onCheckedChange={(e) => setShowSomeLetters(e === true)}
+          disabled={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
         />
         <span>Show some letters</span>
       </label>

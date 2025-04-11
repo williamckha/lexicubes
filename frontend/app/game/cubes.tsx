@@ -34,21 +34,25 @@ export function Cubes({ puzzle }: CubesProps) {
 
   const windowSize = useWindowSize();
 
-  const windowWidth = Math.max((windowSize.width ?? 0) - CUBES_CONTAINER_MARGIN * 2, 0);
-  const windowHeight = Math.max((windowSize.height ?? 0) - CUBES_CONTAINER_MARGIN * 2, 0);
+  const windowWidth = windowSize.width ?? 0;
+  const windowHeight = windowSize.height ?? 0;
 
   if (windowWidth === 0 || windowHeight === 0) {
     return null;
   }
+
+  const maxContainerWidth = Math.max(windowWidth - CUBES_CONTAINER_MARGIN_PX * 2, 0);
+  const maxContainerHeight =
+    Math.max(windowHeight - CUBES_CONTAINER_MARGIN_PX * 2, 0) * (windowHeight > 600 ? 1 : 0.55);
 
   const containerWidthFactor =
     Math.sqrt(3) * Math.max(puzzle.dimensions.lengthX, puzzle.dimensions.lengthZ);
   const containerHeightFactor =
     Math.max(puzzle.dimensions.lengthX, puzzle.dimensions.lengthZ) + puzzle.dimensions.lengthY;
 
-  const maxCubeWidth = windowWidth / containerWidthFactor;
-  const maxCubeHeight = windowHeight / containerHeightFactor;
-  const cubeSize = Math.min(Math.min(maxCubeWidth, maxCubeHeight), CUBE_MAX_SIZE);
+  const maxCubeWidth = maxContainerWidth / containerWidthFactor;
+  const maxCubeHeight = maxContainerHeight / containerHeightFactor;
+  const cubeSize = Math.min(Math.min(maxCubeWidth, maxCubeHeight), CUBE_MAX_SIZE_PX);
 
   const containerWidth = cubeSize * containerWidthFactor;
   const containerHeight = cubeSize * containerHeightFactor;
@@ -87,8 +91,8 @@ interface CubeProps {
 }
 
 function Cube({ puzzle, cube, size, ref }: CubeProps) {
-  const tileWidth = ((size - CUBE_BORDER_WIDTH) * Math.sqrt(3)) / 2;
-  const tileHeight = (size - CUBE_BORDER_WIDTH) / 2;
+  const tileWidth = ((size - CUBE_BORDER_WIDTH_PX) * Math.sqrt(3)) / 2;
+  const tileHeight = (size - CUBE_BORDER_WIDTH_PX) / 2;
 
   const top = cube.x * tileHeight + cube.z * tileHeight - cube.y * tileHeight * 2;
   const left = cube.x * tileWidth - cube.z * tileWidth;
@@ -246,6 +250,6 @@ const CUBE_FACE_CONSTANTS = {
   },
 };
 
-const CUBE_MAX_SIZE = 60;
-const CUBE_BORDER_WIDTH = 2;
-const CUBES_CONTAINER_MARGIN = 12;
+const CUBE_MAX_SIZE_PX = 60;
+const CUBE_BORDER_WIDTH_PX = 2;
+const CUBES_CONTAINER_MARGIN_PX = 24;
