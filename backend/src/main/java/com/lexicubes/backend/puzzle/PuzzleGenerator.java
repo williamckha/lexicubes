@@ -5,41 +5,13 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class PuzzleGenerator {
-
-    private final int[] letterDistribution = {
-            14810,
-            2715,
-            4943,
-            7874,
-            21912,
-            4200,
-            3693,
-            10795,
-            13318,
-            188,
-            1257,
-            7253,
-            4761,
-            12666,
-            14003,
-            3316,
-            205,
-            10977,
-            11450,
-            16587,
-            5246,
-            2019,
-            3819,
-            315,
-            3853,
-            128
-    };
-
-    private final int letterDistributionTotal = Arrays.stream(letterDistribution).sum();
 
     private final PuzzleRepository puzzleRepository;
 
@@ -53,12 +25,11 @@ public class PuzzleGenerator {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Puzzle generateAndSaveDailyPuzzle(LocalDate date) {
         final Optional<Puzzle> existingPuzzle = puzzleRepository.findDailyByPublishedDate(date);
-        return existingPuzzle.orElseGet(() -> puzzleRepository.save(Puzzle.of(date, true, generatePuzzleCubes(3))));
+        return existingPuzzle.orElseGet(() -> puzzleRepository.save(Puzzle.of(date, true, generatePyramidPuzzleCubes(3))));
     }
 
-    public List<Puzzle.Cube> generatePuzzleCubes(int size) {
-        final int numCubes = size * size * size;
-        final List<Puzzle.Cube> cubes = new ArrayList<>(numCubes);
+    public List<Puzzle.Cube> generatePyramidPuzzleCubes(int size) {
+        final List<Puzzle.Cube> cubes = new ArrayList<>();
 
         int cubeId = 0;
         for (int y = 0; y < size; y++) {
@@ -74,13 +45,46 @@ public class PuzzleGenerator {
     }
 
     private char getRandomLetter() {
-        int randomNumber = random.nextInt(1, letterDistributionTotal);
-        for (int i = 0; i < letterDistribution.length; i++) {
-            randomNumber -= letterDistribution[i];
+        double randomNumber = random.nextDouble();
+        for (int i = 0; i < LETTER_FREQUENCY.length; i++) {
+            randomNumber -= LETTER_FREQUENCY[i];
             if (randomNumber <= 0) {
                 return (char) ('a' + i);
             }
         }
         return 'z';
     }
+
+    /**
+     * Letter frequency based on English language dictionaries.
+     * Taken from <a href="https://en.wikipedia.org/wiki/Letter_frequency">Wikipedia</a>.
+     */
+    private static final double[] LETTER_FREQUENCY = {
+            0.0780, // a
+            0.0200, // b
+            0.0400, // c
+            0.0380, // d
+            0.1100, // e
+            0.0140, // f
+            0.0300, // g
+            0.0230, // h
+            0.0860, // i
+            0.0021, // j
+            0.0097, // k
+            0.0530, // l
+            0.0270, // m
+            0.0720, // n
+            0.0610, // o
+            0.0280, // p
+            0.0019, // q
+            0.0730, // r
+            0.0870, // s
+            0.0670, // t
+            0.0330, // u
+            0.0100, // v
+            0.0091, // w
+            0.0027, // x
+            0.0160, // y
+            0.0044  // z
+    };
 }
