@@ -1,8 +1,15 @@
-import { usePuzzleActions, usePuzzleCurrentPath, usePuzzleRemovedCubes } from "~/game/puzzle-store";
+import {
+  usePuzzleActions,
+  usePuzzleCurrentPath,
+  usePuzzleNumRemainingWordsIncludingFace,
+  usePuzzleRemovedCubes,
+  usePuzzleScore,
+} from "~/game/puzzle-store";
 import { createRef, type MouseEvent, type Ref, type TouchEvent, useEffect, useState } from "react";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import type { Puzzle, PuzzleCube, PuzzleCubeFace } from "~/game/puzzle-queries";
+import { PERK_SCORES } from "~/game/game-constants";
 
 interface CubesProps {
   puzzle: Puzzle;
@@ -118,6 +125,11 @@ interface CubeFaceProps {
 
 function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
   const currentPath = usePuzzleCurrentPath();
+  const numRemainingWordsIncludingFace = usePuzzleNumRemainingWordsIncludingFace(
+    puzzle.id,
+    face.id,
+  );
+  const puzzleScore = usePuzzleScore(puzzle.id);
   const { startPath, continuePath } = usePuzzleActions();
 
   const handleMouseDown = (event: MouseEvent) => {
@@ -200,6 +212,8 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
     ? "bg-tile-selected"
     : "bg-card transition";
 
+  const hitboxMargin = size * 0.2;
+
   return (
     <div
       className={`select-none flex items-stretch
@@ -215,17 +229,26 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
     >
       <div
         className="flex flex-1 items-stretch"
-        style={{ margin: size * 0.2 }}
+        style={{ margin: hitboxMargin }}
         onMouseMove={handleMouseMove}
         onTouchMove={handleTouchMove}
       >
         <div
-          className={`flex flex-1 items-center
-                    ${CUBE_FACE_CONSTANTS.INNER_ROTATION[orientation]}`}
+          className={`flex flex-1 flex-col justify-center items-center relative
+                      ${CUBE_FACE_CONSTANTS.INNER_ROTATION[orientation]}`}
         >
-          <span className={`flex-1 text-center font-bold`} style={{ fontSize: size / 2 }}>
+          <span className="flex-1 text-center font-bold" style={{ fontSize: size / 2 }}>
             {face.letter.toUpperCase()}
           </span>
+          {puzzleScore >= PERK_SCORES.SHOW_NUM_REMAINING_WORDS_INCLUDING_FACE && (
+            <span
+              className={`absolute -bottom-2 text-xs font-semibold opacity-50
+                        ${CUBE_FACE_CONSTANTS.HINT_POSITION[orientation]}`}
+              style={{ margin: -hitboxMargin, fontSize: size / 6 }}
+            >
+              {numRemainingWordsIncludingFace}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -247,6 +270,11 @@ const CUBE_FACE_CONSTANTS = {
     top: "brightness-100",
     left: "brightness-80",
     right: "brightness-90",
+  },
+  HINT_POSITION: {
+    top: "-bottom-2",
+    left: "bottom-0 left-1",
+    right: "bottom-0 right-1",
   },
 };
 

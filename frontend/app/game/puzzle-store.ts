@@ -11,6 +11,8 @@ export type WordInfoStatus = "tooShort" | "notInList" | "alreadyFound" | "succes
 export interface WordInfoState {
   status: WordInfoStatus;
   word: string;
+  numPoints: number;
+  isBonus: boolean;
 }
 
 interface PuzzleState {
@@ -57,8 +59,17 @@ const usePuzzleStore = create<PuzzleStoreState>()(
         resetPuzzleState: (puzzle: Puzzle) => {
           set((state) => {
             const requiredSolutions = puzzle.solutions.filter((sol) => !sol.isBonus);
+            const allFaces = puzzle.cubes.flatMap((cube) => [
+              cube.topFace,
+              cube.leftFace,
+              cube.rightFace,
+            ]);
 
             const numRemainingWordsIncludingFace: Record<number, number> = {};
+            for (const face of allFaces) {
+              numRemainingWordsIncludingFace[face.id] = 0;
+            }
+
             for (const solution of requiredSolutions) {
               for (const faceId of solution.faceIds) {
                 numRemainingWordsIncludingFace[faceId] =
@@ -122,28 +133,44 @@ const usePuzzleStore = create<PuzzleStoreState>()(
               state.wordInfo = {
                 status: "tooShort",
                 word: state.currentWord,
+                numPoints: 0,
+                isBonus: false,
               };
             } else if (solution) {
               if (state.puzzles[puzzle.id].foundWords.includes(state.currentWord)) {
                 state.wordInfo = {
                   status: "alreadyFound",
                   word: state.currentWord,
+                  numPoints: 0,
+                  isBonus: false,
                 };
               } else {
                 state.puzzles[puzzle.id].foundWords.push(state.currentWord);
-                for (const face of state.currentPath) {
-                  state.puzzles[puzzle.id].numRemainingWordsIncludingFace[face.id] -= 1;
+
+                const solution = puzzle.solutions.find((sol) => sol.word === state.currentWord);
+                const isBonus = solution?.isBonus ?? false;
+                const numPoints = !isBonus ? getNumberOfPointsForWord(state.currentWord) : 0;
+                state.puzzles[puzzle.id].score += numPoints;
+
+                if (solution && !solution.isBonus) {
+                  for (const faceId of solution.faceIds) {
+                    state.puzzles[puzzle.id].numRemainingWordsIncludingFace[faceId] -= 1;
+                  }
                 }
-                state.puzzles[puzzle.id].score += getNumberOfPointsForWord(state.currentWord);
+
                 state.wordInfo = {
                   status: "success",
                   word: state.currentWord,
+                  numPoints: numPoints,
+                  isBonus: isBonus,
                 };
               }
             } else {
               state.wordInfo = {
                 status: "notInList",
                 word: state.currentWord,
+                numPoints: 0,
+                isBonus: false,
               };
             }
 
@@ -156,7 +183,8 @@ const usePuzzleStore = create<PuzzleStoreState>()(
 
         _tryAddFaceToPath: (puzzle: Puzzle, face: PuzzleCubeFace) => {
           set((state) => {
-            if (getCubesBlockingFace(puzzle, face).length === 0) {
+            const removedCubes = state.puzzles[puzzle.id].removedCubes;
+            if (getCubesBlockingFace(puzzle, face, removedCubes).length === 0) {
               state.currentWord += face.letter;
               state.currentPath.push(face);
             }
@@ -169,7 +197,7 @@ const usePuzzleStore = create<PuzzleStoreState>()(
               state.puzzles[puzzle.id].numRemainingWordsIncludingFace;
 
             const removedCubes = state.puzzles[puzzle.id].removedCubes;
-            const presentCubes = puzzle.cubes.filter((c) => !removedCubes.includes(c.id));
+            const presentCubes = puzzle.cubes.filter((cube) => !removedCubes.includes(cube.id));
 
             for (const cube of presentCubes) {
               if (
@@ -202,6 +230,11 @@ export const usePuzzleFoundWords = (puzzleId: number) =>
 
 export const usePuzzleRemovedCubes = (puzzleId: number) =>
   usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.removedCubes ?? []));
+
+export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number, faceId: number) =>
+  usePuzzleStore(
+    useShallow((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0),
+  );
 
 export const usePuzzleScore = (puzzleId: number) =>
   usePuzzleStore(
@@ -242,12 +275,17 @@ function isCoordinateWithinPuzzleBounds(puzzle: Puzzle, x: number, y: number, z:
   );
 }
 
-function getCubesBlockingFace(puzzle: Puzzle, face: PuzzleCubeFace): PuzzleCube[] {
+function getCubesBlockingFace(
+  puzzle: Puzzle,
+  face: PuzzleCubeFace,
+  removedCubes: number[],
+): PuzzleCube[] {
+  const allCubes = puzzle.cubes.filter((cube) => !removedCubes.includes(cube.id));
   const cubesBlockingFace = new Set<PuzzleCube>();
 
   function getCubesBlockingCoordinate(x: number, y: number, z: number) {
     for (let i = 0; isCoordinateWithinPuzzleBounds(puzzle, x + i, y + i, z + i); i++) {
-      const cube = puzzle.cubes.find(
+      const cube = allCubes.find(
         (cube) => cube.x === x + i && cube.y === y + i && cube.z === z + i,
       );
       if (cube) {

@@ -1,9 +1,4 @@
-import {
-  getNumberOfPointsForWord,
-  MIN_WORD_LENGTH,
-  usePuzzleCurrentWord,
-  usePuzzleWordInfo,
-} from "~/game/puzzle-store";
+import { MIN_WORD_LENGTH, usePuzzleCurrentWord, usePuzzleWordInfo } from "~/game/puzzle-store";
 
 const WORD_INFO_MESSAGES = {
   tooShort: "Too short",
@@ -29,7 +24,7 @@ export function WordInfo() {
       )}
       {isWordInfoAvailable && wordInfo.status === "success" && (
         <span className="text-3xl sm:text-4xl font-bold text-amber-600 animate-word-info-fade-in-out">
-          +{getNumberOfPointsForWord(wordInfo.word)} points
+          {wordInfo.isBonus ? "Bonus word found!" : `+${wordInfo.numPoints} points`}
         </span>
       )}
       {isWordInfoAvailable && wordInfo.status !== "success" && (
