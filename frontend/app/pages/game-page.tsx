@@ -15,6 +15,13 @@ import {
 import { AboutPage } from "~/pages/about-page";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import React from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { usePuzzleActions } from "~/game/puzzle-store";
 
 interface GamePageProps {
   puzzleId: PuzzleQueryId;
@@ -22,6 +29,7 @@ interface GamePageProps {
 
 export function GamePage({ puzzleId }: GamePageProps) {
   const { data: puzzle, error, isPending, isError } = usePuzzleQuery(puzzleId);
+  const puzzleActions = usePuzzleActions();
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -36,9 +44,18 @@ export function GamePage({ puzzleId }: GamePageProps) {
       <header className="flex justify-center bg-tile-selected border-b-2 shadow-lg">
         <div className="flex flex-1 justify-center items-center max-w-200 mx-4">
           <div className="flex flex-1 justify-start items-center">
-            <HeaderButton>
-              <GiHamburgerMenu size={28} />
-            </HeaderButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <HeaderButton>
+                  <GiHamburgerMenu size={28} />
+                </HeaderButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => puzzleActions.resetPuzzleState(puzzle)}>
+                  Reset puzzle
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <HeaderButton>
               <MdLeaderboard size={28} />
             </HeaderButton>

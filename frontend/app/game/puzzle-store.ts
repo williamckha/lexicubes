@@ -31,6 +31,7 @@ type PuzzleStoreState = {
 
 type PuzzleStoreActions = {
   initializePuzzleStateIfAbsent: (puzzle: Puzzle) => void;
+  resetPuzzleState: (puzzle: Puzzle) => void;
   startPath: (puzzle: Puzzle, startingFace: PuzzleCubeFace) => void;
   continuePath: (puzzle: Puzzle, face: PuzzleCubeFace) => void;
   submitPath: (puzzle: Puzzle) => void;
@@ -48,30 +49,38 @@ const usePuzzleStore = create<PuzzleStoreState>()(
       puzzles: {},
       actions: {
         initializePuzzleStateIfAbsent: (puzzle: Puzzle) => {
+          if (!(puzzle.id in get().puzzles)) {
+            get().actions.resetPuzzleState(puzzle);
+          }
+        },
+
+        resetPuzzleState: (puzzle: Puzzle) => {
           set((state) => {
-            if (!(puzzle.id in state.puzzles)) {
-              const requiredSolutions = puzzle.solutions.filter((sol) => !sol.isBonus);
+            const requiredSolutions = puzzle.solutions.filter((sol) => !sol.isBonus);
 
-              const numRemainingWordsIncludingFace: Record<number, number> = {};
-              for (const solution of requiredSolutions) {
-                for (const faceId of solution.faceIds) {
-                  numRemainingWordsIncludingFace[faceId] =
-                    (numRemainingWordsIncludingFace[faceId] ?? 0) + 1;
-                }
+            const numRemainingWordsIncludingFace: Record<number, number> = {};
+            for (const solution of requiredSolutions) {
+              for (const faceId of solution.faceIds) {
+                numRemainingWordsIncludingFace[faceId] =
+                  (numRemainingWordsIncludingFace[faceId] ?? 0) + 1;
               }
-
-              const maxScore = requiredSolutions
-                .map((sol) => getNumberOfPointsForWord(sol.word))
-                .reduce((acc, score) => acc + score, 0);
-
-              state.puzzles[puzzle.id] = {
-                foundWords: [],
-                removedCubes: [],
-                numRemainingWordsIncludingFace: numRemainingWordsIncludingFace,
-                score: 0,
-                maxScore: maxScore,
-              };
             }
+
+            const maxScore = requiredSolutions
+              .map((sol) => getNumberOfPointsForWord(sol.word))
+              .reduce((acc, score) => acc + score, 0);
+
+            state.puzzles[puzzle.id] = {
+              foundWords: [],
+              removedCubes: [],
+              numRemainingWordsIncludingFace: numRemainingWordsIncludingFace,
+              score: 0,
+              maxScore: maxScore,
+            };
+
+            state.currentWord = "";
+            state.currentPath = [];
+            state.wordInfo = null;
           });
 
           get().actions._updateRemovedCubes(puzzle);
