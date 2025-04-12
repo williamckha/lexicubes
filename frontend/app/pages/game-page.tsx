@@ -40,9 +40,9 @@ export function GamePage({ puzzleId }: GamePageProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col justify-stretch items-stretch">
+    <div className="flex flex-1 flex-col h-full">
       <header className="flex justify-center bg-accent-secondary border-b-2 shadow-lg">
-        <div className="flex flex-1 justify-center items-center max-w-200 mx-4">
+        <div className="flex flex-1 justify-center items-center max-w-240 mx-4">
           <div className="flex flex-1 justify-start items-center">
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -84,8 +84,10 @@ export function GamePage({ puzzleId }: GamePageProps) {
           </div>
         </div>
       </header>
-      <main className="flex flex-1 justify-center items-center">
-        <Game puzzle={puzzle} />
+      <main className="flex flex-1 justify-center min-h-0 ">
+        <div className="flex flex-1 max-w-235 mx-8 gap-8">
+          <Game puzzle={puzzle} />
+        </div>
       </main>
     </div>
   );

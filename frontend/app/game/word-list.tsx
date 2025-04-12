@@ -59,7 +59,7 @@ export function WordList({ puzzle }: WordListProps) {
       {Object.entries(allWordsGroupedByLength)
         .sort()
         .map(([numLetters, words]) => (
-          <div key={numLetters} className="flex flex-col gap-2">
+          <div key={numLetters} className="flex flex-col gap-4">
             <h2>{`${numLetters} letters`}</h2>
             <div className="flex flex-wrap gap-x-3 gap-y-1 empty:hidden">
               {words

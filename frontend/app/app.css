@@ -28,6 +28,10 @@
     }
 }
 
+/* Custom breakpoints for screen heights */
+@custom-variant short (@media (height >= 30rem));
+@custom-variant tall (@media (height >= 40rem));
+
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);

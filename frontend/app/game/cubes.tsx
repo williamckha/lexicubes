@@ -40,7 +40,6 @@ export function Cubes({ puzzle }: CubesProps) {
   }, []);
 
   const windowSize = useWindowSize();
-
   const windowWidth = windowSize.width ?? 0;
   const windowHeight = windowSize.height ?? 0;
 
@@ -49,8 +48,7 @@ export function Cubes({ puzzle }: CubesProps) {
   }
 
   const maxContainerWidth = Math.max(windowWidth - CUBES_CONTAINER_MARGIN_PX * 2, 0);
-  const maxContainerHeight =
-    Math.max(windowHeight - CUBES_CONTAINER_MARGIN_PX * 2, 0) * (windowHeight > 600 ? 1 : 0.55);
+  const maxContainerHeight = Math.max(windowHeight - CUBES_CONTAINER_MARGIN_PX * 2 - 220, 0);
 
   const containerWidthFactor =
     Math.sqrt(3) * Math.max(puzzle.dimensions.lengthX, puzzle.dimensions.lengthZ);

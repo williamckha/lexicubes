@@ -27,12 +27,12 @@ export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
   );
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-1 short:gap-2 tall:gap-4">
       <div
         className="flex flex-col items-center gap-2 select-none cursor-pointer"
         onClick={onWordCountClick}
       >
-        <span className="text-3xl font-semibold">
+        <span className="text-xl short:text-2xl tall:text-3xl font-semibold">
           <span>{foundNonBonusWords.length}</span> / <span>{nonBonusWords.length}</span> words
         </span>
         {foundBonusWords.length > 0 && (
