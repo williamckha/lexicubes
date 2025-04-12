@@ -36,7 +36,7 @@ export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
           <span>{foundNonBonusWords.length}</span> / <span>{nonBonusWords.length}</span> words
         </span>
         {foundBonusWords.length > 0 && (
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-muted-foreground">
             +<span>{foundBonusWords.length}</span> bonus words
           </span>
         )}
@@ -65,7 +65,7 @@ function ScoreBar({ score }: ScoreBarProps) {
         />
       )}
       <div
-        className="bg-tile-selected box-content border-r-2 h-full transition-[width] duration-500 z-0"
+        className="bg-accent-secondary box-content border-r-2 h-full transition-[width] duration-500 z-0"
         style={{ width: `${Math.max(score, 1)}%` }}
       />
     </div>

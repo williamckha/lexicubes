@@ -209,7 +209,7 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
   };
 
   const faceStyle = currentPath.some((f) => f.id === face.id)
-    ? "bg-tile-selected"
+    ? "bg-accent-secondary"
     : "bg-card transition";
 
   const hitboxMargin = size * 0.2;

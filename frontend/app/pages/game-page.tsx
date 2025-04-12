@@ -41,7 +41,7 @@ export function GamePage({ puzzleId }: GamePageProps) {
 
   return (
     <div className="flex flex-1 flex-col justify-stretch items-stretch">
-      <header className="flex justify-center bg-tile-selected border-b-2 shadow-lg">
+      <header className="flex justify-center bg-accent-secondary border-b-2 shadow-lg">
         <div className="flex flex-1 justify-center items-center max-w-200 mx-4">
           <div className="flex flex-1 justify-start items-center">
             <DropdownMenu>
@@ -70,7 +70,7 @@ export function GamePage({ puzzleId }: GamePageProps) {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Lexicubes</DialogTitle>
+                  <DialogTitle>About</DialogTitle>
                   <VisuallyHidden>
                     <DialogDescription>About the game</DialogDescription>
                   </VisuallyHidden>
