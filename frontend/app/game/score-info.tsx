@@ -12,19 +12,17 @@ export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
   const foundWords = usePuzzleFoundWords(puzzle.id);
   const puzzleScore = usePuzzleScore(puzzle.id);
 
-  const nonBonusWords = puzzle.solutions.filter((sol) => !sol.isBonus);
+  const requiredWords = puzzle.solutions.filter((sol) => !sol.isBonus);
 
-  const [foundNonBonusWords, foundBonusWords] = foundWords.reduce(
-    (groups: string[][], word: string) => {
-      if (nonBonusWords.find((sol) => sol.word === word)) {
-        groups[0].push(word);
-      } else {
-        groups[1].push(word);
-      }
-      return groups;
-    },
-    [[], []],
-  );
+  let numRequiredWordsFound = 0;
+  let numBonusWordsFound = 0;
+  for (const word of foundWords) {
+    if (requiredWords.find((sol) => sol.word === word)) {
+      numRequiredWordsFound++;
+    } else {
+      numBonusWordsFound++;
+    }
+  }
 
   return (
     <div className="flex flex-col items-center gap-1 short:gap-2 tall:gap-4">
@@ -33,11 +31,11 @@ export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
         onClick={onWordCountClick}
       >
         <span className="text-xl short:text-2xl tall:text-3xl font-semibold">
-          <span>{foundNonBonusWords.length}</span> / <span>{nonBonusWords.length}</span> words
+          <span>{numRequiredWordsFound}</span> / <span>{requiredWords.length}</span> words
         </span>
-        {foundBonusWords.length > 0 && (
+        {numBonusWordsFound > 0 && (
           <span className="text-sm text-muted-foreground">
-            +<span>{foundBonusWords.length}</span> bonus words
+            +<span>{numBonusWordsFound}</span> bonus words
           </span>
         )}
       </div>

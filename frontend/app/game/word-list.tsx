@@ -89,23 +89,32 @@ interface Word {
 }
 
 function obscureWord(word: string, hideAllLetters: boolean): string {
-  const numStartingLettersToShow = hideAllLetters
-    ? 0
-    : word.length > 12
-      ? 3
-      : word.length > 5
-        ? 2
-        : 1;
-  const numEndingLettersToShow = hideAllLetters
-    ? 0
-    : word.length === 7
-      ? 1
-      : word.length === 8
-        ? 2
-        : word.length >= 10
-          ? 3
-          : 0;
+  if (hideAllLetters) {
+    return "-".repeat(word.length);
+  }
+
+  let numStartingLettersToShow: number;
+  if (word.length > 12) {
+    numStartingLettersToShow = 3;
+  } else if (word.length > 5) {
+    numStartingLettersToShow = 2;
+  } else {
+    numStartingLettersToShow = 1;
+  }
+
+  let numEndingLettersToShow: number;
+  if (word.length >= 10) {
+    numEndingLettersToShow = 3;
+  } else if (word.length === 8) {
+    numEndingLettersToShow = 2;
+  } else if (word.length === 7) {
+    numEndingLettersToShow = 1;
+  } else {
+    numEndingLettersToShow = 0;
+  }
+
   const numLettersToHide = word.length - numStartingLettersToShow - numEndingLettersToShow;
+
   return (
     word.substring(0, numStartingLettersToShow) +
     "-".repeat(numLettersToHide) +
