@@ -1,6 +1,6 @@
 import { usePuzzleFoundWords, usePuzzleScore } from "~/game/puzzle-store";
 import { useState } from "react";
-import { Checkbox } from "~/components/ui/checkbox";
+import { CheckboxWithLabel } from "~/components/ui/checkbox";
 import type { Puzzle } from "~/game/puzzle-queries";
 import { PERK_SCORES } from "~/game/game-constants";
 
@@ -39,23 +39,26 @@ export function WordList({ puzzle }: WordListProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold">Hints</h1>
-      <label className="flex items-center gap-2">
-        <Checkbox
-          checked={sortWordsAlphabetically}
-          onCheckedChange={(e) => setSortWordsAlphabetically(e === true)}
-        />
-        <span>Sort words alphabetically</span>
-      </label>
-      <label className="flex items-center gap-2">
-        <Checkbox
-          checked={showSomeLetters}
-          onCheckedChange={(e) => setShowSomeLetters(e === true)}
-          disabled={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
-        />
-        <span>Show some letters</span>
-      </label>
+
+      <CheckboxWithLabel
+        checked={sortWordsAlphabetically}
+        onCheckedChange={(e) => setSortWordsAlphabetically(e === true)}
+        label="Sort words alphabetically"
+        description="Shows all missing words in the word list, sorted alphabetically alongside the words
+                     you've already found, so you know where to look next."
+      />
+
+      <CheckboxWithLabel
+        checked={showSomeLetters}
+        onCheckedChange={(e) => setShowSomeLetters(e === true)}
+        disabled={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
+        label="Show some letters"
+        description="Show some letters of the missing words. Shorter words show only the first letter, while
+                     longer words may reveal the first two and occasionally some ending letters."
+      />
+
       {Object.entries(allWordsGroupedByLength)
         .sort()
         .map(([numLetters, words]) => (
