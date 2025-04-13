@@ -15,20 +15,15 @@ export function WordList({ puzzle }: WordListProps) {
   const [sortWordsAlphabetically, setSortWordsAlphabetically] = useState(false);
   const [showSomeLetters, setShowSomeLetters] = useState(false);
 
-  const allWordsGroupedByLength = puzzle.solutions
-    .map((sol) => {
-      return {
-        word: sol.word,
-        found: foundWords.includes(sol.word),
-        isBonus: sol.isBonus,
-      };
-    })
-    .filter((word) => !word.isBonus || word.found)
-    .reduce((groups: Record<number, Word[]>, word) => {
-      groups[word.word.length] = groups[word.word.length] ?? [];
-      groups[word.word.length].push(word);
-      return groups;
-    }, {});
+  const allWords = puzzle.solutions.map((sol) => {
+    return {
+      word: sol.word,
+      found: foundWords.includes(sol.word),
+      isBonus: sol.isBonus,
+    };
+  });
+
+  type Word = (typeof allWords)[number];
 
   const wordComparator = (wordA: Word, wordB: Word): number => {
     if (!sortWordsAlphabetically && wordA.found !== wordB.found) {
@@ -36,6 +31,21 @@ export function WordList({ puzzle }: WordListProps) {
       return wordA.found ? -1 : 1;
     }
     return wordA.word.localeCompare(wordB.word);
+  };
+
+  const allRequiredWordsGroupedByLength = allWords
+    .filter((word) => !word.isBonus)
+    .reduce((groups: Record<number, Word[]>, word) => {
+      groups[word.word.length] = groups[word.word.length] ?? [];
+      groups[word.word.length].push(word);
+      return groups;
+    }, {});
+
+  const allBonusWords = allWords.filter((word) => word.isBonus).sort(wordComparator);
+
+  const getNumWordsLeftString = (words: Word[]) => {
+    const numWordsLeft = words.length - words.filter((word) => word.found).length;
+    return `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
   };
 
   return (
@@ -59,7 +69,7 @@ export function WordList({ puzzle }: WordListProps) {
                      longer words may reveal the first two and occasionally some ending letters."
       />
 
-      {Object.entries(allWordsGroupedByLength)
+      {Object.entries(allRequiredWordsGroupedByLength)
         .sort()
         .map(([numLetters, words]) => (
           <div key={numLetters} className="flex flex-col gap-4">
@@ -75,20 +85,28 @@ export function WordList({ puzzle }: WordListProps) {
                 ))}
             </div>
             {!sortWordsAlphabetically && !showSomeLetters && (
-              <span className="text-sm text-muted-foreground">
-                {getNumberOfWordsLeftString(words)}
-              </span>
+              <span className="text-sm text-muted-foreground">{getNumWordsLeftString(words)}</span>
             )}
           </div>
         ))}
+
+      <div className="flex flex-col gap-4">
+        <h2>Bonus words</h2>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 empty:hidden">
+          {allBonusWords
+            .filter(({ found }) => found)
+            .map(({ word }) => (
+              <span key={word} className="text-lg">
+                {word}
+              </span>
+            ))}
+        </div>
+        <span className="text-sm text-muted-foreground">
+          {getNumWordsLeftString(allBonusWords)}
+        </span>
+      </div>
     </div>
   );
-}
-
-interface Word {
-  word: string;
-  found: boolean;
-  isBonus: boolean;
 }
 
 function obscureWord(word: string, hideAllLetters: boolean) {
@@ -123,9 +141,4 @@ function obscureWord(word: string, hideAllLetters: boolean) {
     "-".repeat(numLettersToHide) +
     word.substring(word.length - numEndingLettersToShow)
   );
-}
-
-function getNumberOfWordsLeftString(words: Word[]) {
-  const numWordsLeft = words.length - words.filter((word) => word.found).length;
-  return `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
 }
