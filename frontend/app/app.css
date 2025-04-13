@@ -3,35 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-    --font-sans: "Inter", Arial, ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
-    --animate-word-info-fade-in-out: 2s linear forwards fade-in-out;
-    @keyframes fade-in-out {
-        0%, 100% {
-            opacity: 0
-        }
-        10%, 60% {
-            opacity: 1
-        }
-    }
-
-    --animate-word-definition-fade-in: 2s linear forwards word-definition-fade-in;
-    @keyframes word-definition-fade-in {
-        0%, 60% {
-            opacity: 0;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
-}
-
-/* Custom breakpoints for screen heights */
-@custom-variant short (@media (height >= 30rem));
-@custom-variant tall (@media (height >= 40rem));
-
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -126,15 +97,37 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@layer base {
-    body {
-        @apply bg-background text-foreground;
+@theme {
+    --font-sans: "Inter", Arial, ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    --animate-word-info-fade-in-out: 2s linear forwards fade-in-out;
+    @keyframes fade-in-out {
+        0%, 100% {
+            opacity: 0
+        }
+        10%, 60% {
+            opacity: 1
+        }
+    }
+
+    --animate-word-definition-fade-in: 2s linear forwards word-definition-fade-in;
+    @keyframes word-definition-fade-in {
+        0%, 60% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 }
 
+/* Custom breakpoints for screen heights */
+@custom-variant short (@media (height >= 30rem));
+@custom-variant tall (@media (height >= 40rem));
+
 html, body {
-    height: 100%;
-    overscroll-behavior: none;
+    @apply bg-background text-foreground h-full overscroll-none;
 }
 
 h2 {

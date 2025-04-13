@@ -3,12 +3,11 @@ import { create } from "zustand/react";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
 import type { Puzzle, PuzzleCube, PuzzleCubeFace } from "~/game/puzzle-queries";
+import { MIN_WORD_LENGTH } from "~/game/game-constants";
 
-export const MIN_WORD_LENGTH = 4;
+type WordInfoStatus = "tooShort" | "notInList" | "alreadyFound" | "success";
 
-export type WordInfoStatus = "tooShort" | "notInList" | "alreadyFound" | "success";
-
-export interface WordInfoState {
+interface WordInfoState {
   status: WordInfoStatus;
   word: string;
   numPoints: number;
@@ -219,38 +218,6 @@ const usePuzzleStore = create<PuzzleStoreState>()(
   ),
 );
 
-export const usePuzzleCurrentWord = () => usePuzzleStore((state) => state.currentWord);
-
-export const usePuzzleCurrentPath = () => usePuzzleStore((state) => state.currentPath);
-
-export const usePuzzleWordInfo = () => usePuzzleStore((state) => state.wordInfo);
-
-export const usePuzzleFoundWords = (puzzleId: number) =>
-  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.foundWords ?? []));
-
-export const usePuzzleRemovedCubes = (puzzleId: number) =>
-  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.removedCubes ?? []));
-
-export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number, faceId: number) =>
-  usePuzzleStore(
-    useShallow((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0),
-  );
-
-export const usePuzzleScore = (puzzleId: number) =>
-  usePuzzleStore(
-    useShallow((state) => {
-      const score = state.puzzles[puzzleId]?.score ?? 0;
-      const maxScore = state.puzzles[puzzleId]?.maxScore ?? 0;
-      return (score / maxScore) * 100;
-    }),
-  );
-
-export const usePuzzleActions = () => usePuzzleStore((state) => state.actions);
-
-export function getNumberOfPointsForWord(word: string): number {
-  return word.length;
-}
-
 function getCubeWithFace(puzzle: Puzzle, face: PuzzleCubeFace): PuzzleCube {
   const cubeWithFace = puzzle.cubes.find(
     (cube) =>
@@ -314,3 +281,35 @@ function getCubesBlockingFace(
 
   return Array.from(cubesBlockingFace);
 }
+
+function getNumberOfPointsForWord(word: string): number {
+  return word.length;
+}
+
+export const usePuzzleCurrentWord = () => usePuzzleStore((state) => state.currentWord);
+
+export const usePuzzleCurrentPath = () => usePuzzleStore((state) => state.currentPath);
+
+export const usePuzzleWordInfo = () => usePuzzleStore((state) => state.wordInfo);
+
+export const usePuzzleFoundWords = (puzzleId: number) =>
+  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.foundWords ?? []));
+
+export const usePuzzleRemovedCubes = (puzzleId: number) =>
+  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.removedCubes ?? []));
+
+export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number, faceId: number) =>
+  usePuzzleStore(
+    useShallow((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0),
+  );
+
+export const usePuzzleScore = (puzzleId: number) =>
+  usePuzzleStore(
+    useShallow((state) => {
+      const score = state.puzzles[puzzleId]?.score ?? 0;
+      const maxScore = state.puzzles[puzzleId]?.maxScore ?? 0;
+      return (score / maxScore) * 100;
+    }),
+  );
+
+export const usePuzzleActions = () => usePuzzleStore((state) => state.actions);

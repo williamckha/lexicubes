@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { usePuzzleActions } from "~/game/puzzle-store";
+import { LoadingSpinner } from "~/components/ui/loading-spinner";
 
 interface GamePageProps {
   puzzleId: PuzzleQueryId;
@@ -32,11 +33,20 @@ export function GamePage({ puzzleId }: GamePageProps) {
   const puzzleActions = usePuzzleActions();
 
   if (isPending) {
-    return <span>Loading...</span>;
+    return (
+      <div className="flex flex-1 h-full justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (isError) {
-    return <span>Error: {error.message}</span>;
+    return (
+      <div className="flex flex-1 flex-col gap-2 h-full justify-center items-center">
+        <span className="font-mono font-bold">Error</span>
+        <span className="font-mono max-w-200">{error.message}</span>
+      </div>
+    );
   }
 
   return (

@@ -1,7 +1,7 @@
 export function AboutPage() {
   return (
     <>
-      <p>Lexicubes is a 3D word search game played on a set of isometric cubes.</p>
+      <p>Lexicubes is a 3D word search game.</p>
       <p>A new puzzle is released every day at midnight.</p>
       <h2>How to play</h2>
       <p>

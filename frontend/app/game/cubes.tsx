@@ -5,13 +5,47 @@ import {
   usePuzzleRemovedCubes,
   usePuzzleScore,
 } from "~/game/puzzle-store";
-import { createRef, type MouseEvent, type Ref, type TouchEvent, useEffect, useState } from "react";
+import React, {
+  createRef,
+  type MouseEvent,
+  type Ref,
+  type TouchEvent,
+  useEffect,
+  useState,
+} from "react";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import type { Puzzle, PuzzleCube, PuzzleCubeFace } from "~/game/puzzle-queries";
+import type { Puzzle, PuzzleCube, PuzzleCubeFace, PuzzleDimensions } from "~/game/puzzle-queries";
 import { PERK_SCORES } from "~/game/game-constants";
 
-interface CubesProps {
+const CUBE_MAX_SIZE_PX = 60;
+const CUBE_BORDER_WIDTH_PX = 2;
+const CUBES_CONTAINER_MARGIN_PX = 24;
+
+const CUBE_FACE_CONSTANTS = {
+  TRANSFORM: {
+    top: "transform-[rotate(210deg)_skewX(-30deg)_scaleY(0.864)]",
+    left: "transform-[rotate(90deg)_skewX(-30deg)_scaleY(0.864)]",
+    right: "transform-[rotate(-30deg)_skewX(-30deg)_scaleY(0.864)]",
+  },
+  INNER_ROTATION: {
+    top: "rotate-135",
+    left: "-rotate-90",
+    right: "rotate-none",
+  },
+  BRIGHTNESS: {
+    top: "brightness-100",
+    left: "brightness-80",
+    right: "brightness-90",
+  },
+  HINT_POSITION: {
+    top: "-bottom-2",
+    left: "bottom-0 left-1",
+    right: "bottom-0 right-1",
+  },
+};
+
+export interface CubesProps {
   puzzle: Puzzle;
 }
 
@@ -43,24 +77,11 @@ export function Cubes({ puzzle }: CubesProps) {
   const windowWidth = windowSize.width ?? 0;
   const windowHeight = windowSize.height ?? 0;
 
-  if (windowWidth === 0 || windowHeight === 0) {
-    return null;
-  }
-
-  const maxContainerWidth = Math.max(windowWidth - CUBES_CONTAINER_MARGIN_PX * 2, 0);
-  const maxContainerHeight = Math.max(windowHeight - CUBES_CONTAINER_MARGIN_PX * 2 - 220, 0);
-
-  const containerWidthFactor =
-    Math.sqrt(3) * Math.max(puzzle.dimensions.lengthX, puzzle.dimensions.lengthZ);
-  const containerHeightFactor =
-    Math.max(puzzle.dimensions.lengthX, puzzle.dimensions.lengthZ) + puzzle.dimensions.lengthY;
-
-  const maxCubeWidth = maxContainerWidth / containerWidthFactor;
-  const maxCubeHeight = maxContainerHeight / containerHeightFactor;
-  const cubeSize = Math.min(Math.min(maxCubeWidth, maxCubeHeight), CUBE_MAX_SIZE_PX);
-
-  const containerWidth = cubeSize * containerWidthFactor;
-  const containerHeight = cubeSize * containerHeightFactor;
+  const { cubeSize, containerWidth, containerHeight } = calculateCubeSize(
+    windowWidth,
+    windowHeight,
+    puzzle.dimensions,
+  );
 
   return (
     <div
@@ -142,43 +163,13 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
 
   const handleTouchStart = (event: TouchEvent) => {
     const touch = event.changedTouches[0];
-    const simulatedEvent = new MouseEvent("mousedown", {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      detail: 1,
-      screenX: touch.screenX,
-      screenY: touch.screenY,
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false,
-      button: 0,
-      relatedTarget: null,
-    });
+    const simulatedEvent = createSimulatedMouseEvent("mousedown", touch);
     touch.target.dispatchEvent(simulatedEvent);
   };
 
   const handleTouchMove = (event: TouchEvent) => {
     const touch = event.changedTouches[0];
-    const simulatedEvent = new MouseEvent("mousemove", {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      detail: 1,
-      screenX: touch.screenX,
-      screenY: touch.screenY,
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false,
-      button: 0,
-      relatedTarget: null,
-    });
+    const simulatedEvent = createSimulatedMouseEvent("mousemove", touch);
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     if (element) {
       element.dispatchEvent(simulatedEvent);
@@ -187,30 +178,15 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
 
   const handleTouchEnd = (event: TouchEvent) => {
     const touch = event.changedTouches[0];
-    const simulatedEvent = new MouseEvent("mouseup", {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      detail: 1,
-      screenX: touch.screenX,
-      screenY: touch.screenY,
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false,
-      button: 0,
-      relatedTarget: null,
-    });
+    const simulatedEvent = createSimulatedMouseEvent("mouseup", touch);
     window.dispatchEvent(simulatedEvent);
   };
 
-  const faceStyle = currentPath.some((f) => f.id === face.id)
-    ? "bg-accent-secondary"
-    : "bg-card transition";
-
+  const isInCurrentPath = currentPath.some((f) => f.id === face.id);
+  const faceStyle = isInCurrentPath ? "bg-accent-secondary" : "bg-card transition";
   const hitboxMargin = size * 0.2;
+  const letterFontSize = size / 2;
+  const hintFontSize = size / 6;
 
   return (
     <div
@@ -235,14 +211,14 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
           className={`flex flex-1 flex-col justify-center items-center relative
                       ${CUBE_FACE_CONSTANTS.INNER_ROTATION[orientation]}`}
         >
-          <span className="flex-1 text-center font-bold" style={{ fontSize: size / 2 }}>
+          <span className="flex-1 text-center font-bold" style={{ fontSize: letterFontSize }}>
             {face.letter.toUpperCase()}
           </span>
           {puzzleScore >= PERK_SCORES.SHOW_NUM_REMAINING_WORDS_INCLUDING_FACE && (
             <span
               className={`absolute -bottom-2 text-xs font-semibold opacity-50
-                        ${CUBE_FACE_CONSTANTS.HINT_POSITION[orientation]}`}
-              style={{ margin: -hitboxMargin, fontSize: size / 6 }}
+                          ${CUBE_FACE_CONSTANTS.HINT_POSITION[orientation]}`}
+              style={{ margin: -hitboxMargin, fontSize: hintFontSize }}
             >
               {numRemainingWordsIncludingFace}
             </span>
@@ -253,29 +229,48 @@ function CubeFace({ puzzle, face, orientation, size }: CubeFaceProps) {
   );
 }
 
-const CUBE_FACE_CONSTANTS = {
-  TRANSFORM: {
-    top: "transform-[rotate(210deg)_skewX(-30deg)_scaleY(0.864)]",
-    left: "transform-[rotate(90deg)_skewX(-30deg)_scaleY(0.864)]",
-    right: "transform-[rotate(-30deg)_skewX(-30deg)_scaleY(0.864)]",
-  },
-  INNER_ROTATION: {
-    top: "rotate-135",
-    left: "-rotate-90",
-    right: "rotate-none",
-  },
-  BRIGHTNESS: {
-    top: "brightness-100",
-    left: "brightness-80",
-    right: "brightness-90",
-  },
-  HINT_POSITION: {
-    top: "-bottom-2",
-    left: "bottom-0 left-1",
-    right: "bottom-0 right-1",
-  },
-};
+function calculateCubeSize(
+  windowWidth: number,
+  windowHeight: number,
+  puzzleDimensions: PuzzleDimensions,
+) {
+  if (windowWidth === 0 || windowHeight === 0) {
+    return { cubeSize: 0, containerWidth: 0, containerHeight: 0 };
+  }
 
-const CUBE_MAX_SIZE_PX = 60;
-const CUBE_BORDER_WIDTH_PX = 2;
-const CUBES_CONTAINER_MARGIN_PX = 24;
+  const maxContainerWidth = Math.max(windowWidth - CUBES_CONTAINER_MARGIN_PX * 2, 0);
+  const maxContainerHeight = Math.max(windowHeight - CUBES_CONTAINER_MARGIN_PX * 2 - 220, 0);
+
+  const containerWidthFactor =
+    Math.sqrt(3) * Math.max(puzzleDimensions.lengthX, puzzleDimensions.lengthZ);
+  const containerHeightFactor =
+    Math.max(puzzleDimensions.lengthX, puzzleDimensions.lengthZ) + puzzleDimensions.lengthY;
+
+  const maxCubeWidth = maxContainerWidth / containerWidthFactor;
+  const maxCubeHeight = maxContainerHeight / containerHeightFactor;
+
+  const cubeSize = Math.min(Math.min(maxCubeWidth, maxCubeHeight), CUBE_MAX_SIZE_PX);
+  const containerWidth = cubeSize * containerWidthFactor;
+  const containerHeight = cubeSize * containerHeightFactor;
+
+  return { cubeSize, containerWidth, containerHeight };
+}
+
+function createSimulatedMouseEvent(eventType: string, touch: React.Touch) {
+  return new MouseEvent(eventType, {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+    detail: 1,
+    screenX: touch.screenX,
+    screenY: touch.screenY,
+    clientX: touch.clientX,
+    clientY: touch.clientY,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    button: 0,
+    relatedTarget: null,
+  });
+}

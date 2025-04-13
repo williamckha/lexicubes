@@ -15,7 +15,7 @@ import type { Puzzle } from "~/game/puzzle-queries";
 import { usePuzzleActions } from "~/game/puzzle-store";
 import { useWindowSize } from "@uidotdev/usehooks";
 
-interface GameProps {
+export interface GameProps {
   puzzle: Puzzle;
 }
 
@@ -23,7 +23,7 @@ export function Game({ puzzle }: GameProps) {
   const { initializePuzzleStateIfAbsent } = usePuzzleActions();
   initializePuzzleStateIfAbsent(puzzle);
 
-  const [isWordListDialogVisible, isWordListPaneVisible, toggleWordListVisibility] =
+  const { isWordListDialogVisible, isWordListPaneVisible, toggleWordListVisibility } =
     useWordListVisibility();
 
   return (
@@ -53,7 +53,7 @@ export function Game({ puzzle }: GameProps) {
   );
 }
 
-function useWordListVisibility(): [boolean, boolean, () => void] {
+function useWordListVisibility() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPaneOpen, setIsPaneOpen] = useState(true);
 
@@ -76,5 +76,5 @@ function useWordListVisibility(): [boolean, boolean, () => void] {
   const isWordListDialogVisible = isDialogOpen && !isPaneEnabled;
   const isWordListPaneVisible = isPaneOpen && isPaneEnabled;
 
-  return [isWordListDialogVisible, isWordListPaneVisible, toggleWordListVisibility];
+  return { isWordListDialogVisible, isWordListPaneVisible, toggleWordListVisibility };
 }

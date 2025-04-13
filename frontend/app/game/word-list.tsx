@@ -4,7 +4,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import type { Puzzle } from "~/game/puzzle-queries";
 import { PERK_SCORES } from "~/game/game-constants";
 
-interface WordListProps {
+export interface WordListProps {
   puzzle: Puzzle;
 }
 
@@ -88,7 +88,7 @@ interface Word {
   isBonus: boolean;
 }
 
-function obscureWord(word: string, hideAllLetters: boolean): string {
+function obscureWord(word: string, hideAllLetters: boolean) {
   if (hideAllLetters) {
     return "-".repeat(word.length);
   }
@@ -122,7 +122,7 @@ function obscureWord(word: string, hideAllLetters: boolean): string {
   );
 }
 
-function getNumberOfWordsLeftString(words: Word[]): string {
+function getNumberOfWordsLeftString(words: Word[]) {
   const numWordsLeft = words.length - words.filter((word) => word.found).length;
   return `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
 }

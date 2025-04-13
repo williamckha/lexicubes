@@ -3,7 +3,7 @@ import type { Puzzle } from "~/game/puzzle-queries";
 import { IoStar } from "react-icons/io5";
 import { PERK_SCORES } from "~/game/game-constants";
 
-interface ScoreInfoProps {
+export interface ScoreInfoProps {
   puzzle: Puzzle;
   onWordCountClick?: () => void;
 }
