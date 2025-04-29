@@ -1,6 +1,8 @@
 package com.lexicubes.backend;
 
+import com.lexicubes.backend.score.Score;
 import com.lexicubes.backend.puzzle.Puzzle;
+import com.lexicubes.backend.user.User;
 import liquibase.database.Database;
 import liquibase.database.core.MySQLDatabase;
 import liquibase.database.jvm.JdbcConnection;
@@ -13,6 +15,7 @@ import org.springframework.data.jdbc.core.mapping.schema.DefaultSqlTypeMapping;
 import org.springframework.data.jdbc.core.mapping.schema.LiquibaseChangeSetWriter;
 import org.springframework.data.jdbc.core.mapping.schema.SqlTypeMapping;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -24,9 +27,10 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.Set;
 
 @SpringBootTest
+@ActiveProfiles("dev")
 public class SchemaGenerationTest {
 
     @Autowired
@@ -40,7 +44,7 @@ public class SchemaGenerationTest {
         final Path changeLogFilePath = getChangeLogFilePath();
         Files.deleteIfExists(changeLogFilePath);
 
-        context.setInitialEntitySet(Collections.singleton(Puzzle.class));
+        context.setInitialEntitySet(Set.of(Puzzle.class, User.class, Score.class));
         final LiquibaseChangeSetWriter writer = new LiquibaseChangeSetWriter(context);
 
         writer.setSqlTypeMapping(((SqlTypeMapping) property -> {

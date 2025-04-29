@@ -1,4 +1,8 @@
-import { usePuzzleFoundWords, usePuzzleScore } from "~/game/puzzle-store";
+import {
+  usePuzzleBonusWordsFound,
+  usePuzzleRequiredWordsFound,
+  usePuzzleScore,
+} from "~/game/puzzle-store";
 import type { Puzzle } from "~/game/puzzle-queries";
 import { IoStar } from "react-icons/io5";
 import { PERK_SCORES } from "~/game/game-constants";
@@ -9,20 +13,11 @@ export interface ScoreInfoProps {
 }
 
 export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
-  const foundWords = usePuzzleFoundWords(puzzle.id);
+  const requiredWordsFound = usePuzzleRequiredWordsFound(puzzle.id);
+  const bonusWordsFound = usePuzzleBonusWordsFound(puzzle.id);
   const puzzleScore = usePuzzleScore(puzzle.id);
 
   const requiredWords = puzzle.solutions.filter((sol) => !sol.isBonus);
-
-  let numRequiredWordsFound = 0;
-  let numBonusWordsFound = 0;
-  for (const word of foundWords) {
-    if (requiredWords.find((sol) => sol.word === word)) {
-      numRequiredWordsFound++;
-    } else {
-      numBonusWordsFound++;
-    }
-  }
 
   return (
     <div className="flex flex-col items-center gap-1 short:gap-2 tall:gap-4">
@@ -31,11 +26,11 @@ export function ScoreInfo({ puzzle, onWordCountClick }: ScoreInfoProps) {
         onClick={onWordCountClick}
       >
         <span className="text-xl short:text-2xl tall:text-3xl font-semibold">
-          <span>{numRequiredWordsFound}</span> / <span>{requiredWords.length}</span> words
+          <span>{requiredWordsFound.length}</span> / <span>{requiredWords.length}</span> words
         </span>
-        {numBonusWordsFound > 0 && (
+        {bonusWordsFound.length > 0 && (
           <span className="text-sm text-muted-foreground">
-            +<span>{numBonusWordsFound}</span> bonus words
+            +<span>{bonusWordsFound.length}</span> bonus words
           </span>
         )}
       </div>

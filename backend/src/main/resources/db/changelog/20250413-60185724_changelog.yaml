@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: '1744587785860'
+      author: wha
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: true
+                  name: email
+                  type: VARCHAR(255 BYTE)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255 BYTE)
+              - column:
+                  constraints:
+                    nullable: true
+                  name: provider
+                  type: VARCHAR(255 BYTE)
+              - column:
+                  constraints:
+                    nullable: true
+                  name: provider_id
+                  type: VARCHAR(255 BYTE)
+            schemaName: lexicubesdb
+            tableName: users
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_scores_puzzles
+                    references: puzzles(id)
+                  name: puzzle_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_scores_users
+                    references: users(id)
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: num_points
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: num_required_words_found
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: num_bonus_words_found
+                  type: INT
+            schemaName: lexicubesdb
+            tableName: scores
+        - createIndex:
+            indexName: idx_scores_puzzle_id
+            tableName: scores
+            columns:
+              - column:
+                  name: puzzle_id
+        - createIndex:
+            indexName: idx_scores_user_id
+            tableName: scores
+            columns:
+              - column:
+                  name: user_id
+

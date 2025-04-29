@@ -15,31 +15,38 @@ interface WordInfoState {
 }
 
 interface PuzzleState {
-  foundWords: string[];
+  requiredWordsFound: string[];
+  bonusWordsFound: string[];
   removedCubes: number[];
   numRemainingWordsIncludingFace: Record<number, number>;
-  score: number;
-  maxScore: number;
+  numPoints: number;
+  maxNumPoints: number;
 }
 
-type PuzzleStoreState = {
+interface PuzzleStoreState {
   currentWord: string;
   currentPath: PuzzleCubeFace[];
   wordInfo: WordInfoState | null;
   puzzles: Record<number, PuzzleState>;
   actions: PuzzleStoreActions;
-};
+}
 
-type PuzzleStoreActions = {
+interface PuzzleStateChange {
+  numPoints: number;
+  numRequiredWordsFound: number;
+  numBonusWordsFound: number;
+}
+
+interface PuzzleStoreActions {
   initializePuzzleStateIfAbsent: (puzzle: Puzzle) => void;
   resetPuzzleState: (puzzle: Puzzle) => void;
   startPath: (puzzle: Puzzle, startingFace: PuzzleCubeFace) => void;
   continuePath: (puzzle: Puzzle, face: PuzzleCubeFace) => void;
-  submitPath: (puzzle: Puzzle) => void;
+  submitPath: (puzzle: Puzzle) => PuzzleStateChange | null;
 
   _tryAddFaceToPath: (puzzle: Puzzle, face: PuzzleCubeFace) => void;
   _updateRemovedCubes: (puzzle: Puzzle) => void;
-};
+}
 
 const usePuzzleStore = create<PuzzleStoreState>()(
   persist(
@@ -81,11 +88,12 @@ const usePuzzleStore = create<PuzzleStoreState>()(
               .reduce((acc, score) => acc + score, 0);
 
             state.puzzles[puzzle.id] = {
-              foundWords: [],
+              requiredWordsFound: [],
+              bonusWordsFound: [],
               removedCubes: [],
               numRemainingWordsIncludingFace: numRemainingWordsIncludingFace,
-              score: 0,
-              maxScore: maxScore,
+              numPoints: 0,
+              maxNumPoints: maxScore,
             };
 
             state.currentWord = "";
@@ -119,7 +127,7 @@ const usePuzzleStore = create<PuzzleStoreState>()(
           }
         },
 
-        submitPath: (puzzle: Puzzle) => {
+        submitPath: (puzzle: Puzzle): PuzzleStateChange | null => {
           set((state) => {
             if (state.currentWord.length === 0) {
               return;
@@ -136,7 +144,11 @@ const usePuzzleStore = create<PuzzleStoreState>()(
                 isBonus: false,
               };
             } else if (solution) {
-              if (state.puzzles[puzzle.id].foundWords.includes(state.currentWord)) {
+              const puzzleState = state.puzzles[puzzle.id];
+              if (
+                puzzleState.requiredWordsFound.includes(state.currentWord) ||
+                puzzleState.bonusWordsFound.includes(state.currentWord)
+              ) {
                 state.wordInfo = {
                   status: "alreadyFound",
                   word: state.currentWord,
@@ -144,16 +156,21 @@ const usePuzzleStore = create<PuzzleStoreState>()(
                   isBonus: false,
                 };
               } else {
-                state.puzzles[puzzle.id].foundWords.push(state.currentWord);
-
                 const solution = puzzle.solutions.find((sol) => sol.word === state.currentWord);
+
                 const isBonus = solution?.isBonus ?? false;
+                if (isBonus) {
+                  puzzleState.bonusWordsFound.push(state.currentWord);
+                } else {
+                  puzzleState.requiredWordsFound.push(state.currentWord);
+                }
+
                 const numPoints = !isBonus ? getNumberOfPointsForWord(state.currentWord) : 0;
-                state.puzzles[puzzle.id].score += numPoints;
+                puzzleState.numPoints += numPoints;
 
                 if (solution && !solution.isBonus) {
                   for (const faceId of solution.faceIds) {
-                    state.puzzles[puzzle.id].numRemainingWordsIncludingFace[faceId] -= 1;
+                    puzzleState.numRemainingWordsIncludingFace[faceId] -= 1;
                   }
                 }
 
@@ -178,6 +195,17 @@ const usePuzzleStore = create<PuzzleStoreState>()(
           });
 
           get().actions._updateRemovedCubes(puzzle);
+
+          if (get().wordInfo?.status === "success") {
+            const puzzleState = get().puzzles[puzzle.id];
+            return {
+              numPoints: puzzleState.numPoints,
+              numRequiredWordsFound: puzzleState.requiredWordsFound.length,
+              numBonusWordsFound: puzzleState.bonusWordsFound.length,
+            };
+          }
+
+          return null;
         },
 
         _tryAddFaceToPath: (puzzle: Puzzle, face: PuzzleCubeFace) => {
@@ -292,24 +320,24 @@ export const usePuzzleCurrentPath = () => usePuzzleStore((state) => state.curren
 
 export const usePuzzleWordInfo = () => usePuzzleStore((state) => state.wordInfo);
 
-export const usePuzzleFoundWords = (puzzleId: number) =>
-  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.foundWords ?? []));
+export const usePuzzleRequiredWordsFound = (puzzleId: number) =>
+  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.requiredWordsFound ?? []));
+
+export const usePuzzleBonusWordsFound = (puzzleId: number) =>
+  usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.bonusWordsFound ?? []));
 
 export const usePuzzleRemovedCubes = (puzzleId: number) =>
   usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.removedCubes ?? []));
 
 export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number, faceId: number) =>
-  usePuzzleStore(
-    useShallow((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0),
-  );
+  usePuzzleStore((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0);
 
 export const usePuzzleScore = (puzzleId: number) =>
-  usePuzzleStore(
-    useShallow((state) => {
-      const score = state.puzzles[puzzleId]?.score ?? 0;
-      const maxScore = state.puzzles[puzzleId]?.maxScore ?? 0;
-      return (score / maxScore) * 100;
-    }),
-  );
+  usePuzzleStore((state) => {
+    const numPoints = state.puzzles[puzzleId]?.numPoints ?? 0;
+    const maxNumPoints = state.puzzles[puzzleId]?.maxNumPoints ?? 0;
+    const score = (numPoints / maxNumPoints) * 100;
+    return Number.isFinite(score) ? score : 0;
+  });
 
 export const usePuzzleActions = () => usePuzzleStore((state) => state.actions);

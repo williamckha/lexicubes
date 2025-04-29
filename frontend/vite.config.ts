@@ -7,10 +7,10 @@ export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   server: {
     proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
+      "/api": "http://localhost:8080",
+      "/oauth2": "http://localhost:8080",
+      "/login": "http://localhost:8080",
+      "/logout": "http://localhost:8080",
     },
   },
 });

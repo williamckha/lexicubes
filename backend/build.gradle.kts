@@ -21,6 +21,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.liquibase:liquibase-core")
     implementation("org.jetbrains:annotations:26.0.2")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")

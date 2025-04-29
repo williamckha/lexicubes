@@ -29,7 +29,7 @@ public class PuzzleController {
         this.puzzleSolver = puzzleSolver;
     }
 
-    @GetMapping("/puzzles/{id}")
+    @GetMapping("/api/puzzles/{id}")
     public PuzzleResponse getPuzzle(@PathVariable Long id) {
         final Optional<Puzzle> puzzle = puzzleRepository.findById(id);
         if (puzzle.isEmpty()) {
@@ -41,7 +41,7 @@ public class PuzzleController {
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
     }
 
-    @GetMapping("/puzzles/daily/{date}")
+    @GetMapping("/api/puzzles/daily/{date}")
     public PuzzleResponse getDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         final Optional<Puzzle> puzzle = puzzleRepository.findDailyByPublishedDate(date);
         if (puzzle.isEmpty()) {
@@ -53,7 +53,7 @@ public class PuzzleController {
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
     }
 
-    @PutMapping("/puzzles/daily/{date}")
+    @PutMapping("/api/puzzles/daily/{date}")
     public ResponseEntity<?> generateDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         final Puzzle puzzle = puzzleGenerator.generateAndSaveDailyPuzzle(date);
 

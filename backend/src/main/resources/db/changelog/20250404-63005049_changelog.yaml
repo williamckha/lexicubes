@@ -1,21 +1,20 @@
 databaseChangeLog:
   - changeSet:
       id: '1743813005133'
-      author: Spring Data Relational
-      objectQuotingStrategy: LEGACY
+      author: wha
       changes:
         - createTable:
             columns:
               - column:
                   autoIncrement: true
                   constraints:
-                    nullable: true
+                    nullable: false
                     primaryKey: true
                   name: id
                   type: BIGINT
               - column:
                   constraints:
-                    nullable: true
+                    nullable: false
                   name: published_date
                   type: DATE
               - column:
@@ -25,7 +24,7 @@ databaseChangeLog:
                   type: TINYINT
               - column:
                   constraints:
-                    nullable: true
+                    nullable: false
                   name: cubes
                   type: JSON
             schemaName: lexicubesdb

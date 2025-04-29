@@ -1,4 +1,8 @@
-import { usePuzzleFoundWords, usePuzzleScore } from "~/game/puzzle-store";
+import {
+  usePuzzleBonusWordsFound,
+  usePuzzleRequiredWordsFound,
+  usePuzzleScore,
+} from "~/game/puzzle-store";
 import { useState } from "react";
 import { CheckboxWithLabel } from "~/components/ui/checkbox";
 import type { Puzzle } from "~/game/puzzle-queries";
@@ -9,7 +13,8 @@ export interface WordListProps {
 }
 
 export function WordList({ puzzle }: WordListProps) {
-  const foundWords = usePuzzleFoundWords(puzzle.id);
+  const requiredWordsFound = usePuzzleRequiredWordsFound(puzzle.id);
+  const bonusWordsFound = usePuzzleBonusWordsFound(puzzle.id);
   const puzzleScore = usePuzzleScore(puzzle.id);
 
   const [sortWordsAlphabetically, setSortWordsAlphabetically] = useState(false);
@@ -18,14 +23,14 @@ export function WordList({ puzzle }: WordListProps) {
   const allWords = puzzle.solutions.map((sol) => {
     return {
       word: sol.word,
-      found: foundWords.includes(sol.word),
+      found: requiredWordsFound.includes(sol.word) || bonusWordsFound.includes(sol.word),
       isBonus: sol.isBonus,
     };
   });
 
-  type Word = (typeof allWords)[number];
+  type WordListEntry = (typeof allWords)[number];
 
-  const wordComparator = (wordA: Word, wordB: Word): number => {
+  const wordComparator = (wordA: WordListEntry, wordB: WordListEntry): number => {
     if (!sortWordsAlphabetically && wordA.found !== wordB.found) {
       // Put all found words at the front and all missing words at the end
       return wordA.found ? -1 : 1;
@@ -35,7 +40,7 @@ export function WordList({ puzzle }: WordListProps) {
 
   const allRequiredWordsGroupedByLength = allWords
     .filter((word) => !word.isBonus)
-    .reduce((groups: Record<number, Word[]>, word) => {
+    .reduce((groups: Record<number, WordListEntry[]>, word) => {
       groups[word.word.length] = groups[word.word.length] ?? [];
       groups[word.word.length].push(word);
       return groups;
@@ -43,7 +48,7 @@ export function WordList({ puzzle }: WordListProps) {
 
   const allBonusWords = allWords.filter((word) => word.isBonus).sort(wordComparator);
 
-  const getNumWordsLeftString = (words: Word[]) => {
+  const getNumWordsLeftString = (words: WordListEntry[]) => {
     const numWordsLeft = words.length - words.filter((word) => word.found).length;
     return `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
   };

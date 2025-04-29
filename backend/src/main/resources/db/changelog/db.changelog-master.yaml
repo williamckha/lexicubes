@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: "db/changelog/20250404-63005049_changelog.yaml"
+  - include:
+      file: "db/changelog/20250413-60185724_changelog.yaml"
