@@ -1,5 +1,6 @@
 package com.lexicubes.backend.score;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -73,4 +74,8 @@ public interface ScoreRepository extends CrudRepository<Score, Long> {
 
     @Query("SELECT AVG(num_bonus_words_found) FROM scores WHERE puzzle_id = :puzzleId")
     int getAverageNumBonusWordsFoundByPuzzleId(Long puzzleId);
+
+    @Modifying
+    @Query("DELETE FROM scores WHERE user_id = :userId")
+    void deleteAllScoresByUserId(Long userId);
 }

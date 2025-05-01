@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 import {
   AppleIcon,
@@ -16,9 +16,14 @@ import {
 } from "./social-icons";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useLogoutMutation, useUserQuery } from "~/user/user-queries";
+import { DeleteUserDialog } from "~/user/delete-user-dialog";
+import { Button } from "~/components/ui/button";
 
 export function UserDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
   const { data: user, isPending, isError } = useUserQuery();
+  const { mutate: logout, isPending: isLogoutPending } = useLogoutMutation();
+
+  const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false);
 
   if (isPending) {
     return null;
@@ -26,6 +31,12 @@ export function UserDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
 
   if (isError || user === null) {
     return <LoginDialog {...props} />;
+  }
+
+  if (isDeleteUserDialogOpen) {
+    return (
+      <DeleteUserDialog open={isDeleteUserDialogOpen} onOpenChange={setIsDeleteUserDialogOpen} />
+    );
   }
 
   const { icon: providerIcon, name: providerName } = SOCIAL_PROVIDERS[user.provider];
@@ -45,7 +56,10 @@ export function UserDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
           <span className="font-semibold">{providerName}</span> as{" "}
           <span className="font-semibold">{user.name}</span>.
         </p>
-        <LogoutButton />
+        <Button onClick={() => setIsDeleteUserDialogOpen(true)}>Delete account</Button>
+        <Button onClick={() => logout()} disabled={isLogoutPending}>
+          Log out
+        </Button>
       </DialogContent>
     </Dialog>
   );
@@ -89,12 +103,12 @@ interface SocialLoginButtonProps {
 function SocialLoginButton({ icon, provider, href }: SocialLoginButtonProps) {
   return (
     <Link to={href} reloadDocument>
-      <div
+      <Button
         className="flex flex-row justify-center items-center gap-2 border-2 p-2 rounded-full font-medium
                       bg-background hover:bg-muted"
       >
         {icon} Continue with {provider}
-      </div>
+      </Button>
     </Link>
   );
 }
@@ -136,18 +150,5 @@ function GitHubLoginButton() {
       provider={SOCIAL_PROVIDERS.github.name}
       href="/oauth2/authorization/github"
     />
-  );
-}
-
-function LogoutButton() {
-  const { mutate: logout } = useLogoutMutation();
-  return (
-    <button
-      onClick={() => logout()}
-      className="flex flex-row justify-center items-center gap-2 border-2 p-2 rounded-full font-medium cursor-pointer
-                 bg-background hover:bg-muted"
-    >
-      Log out
-    </button>
   );
 }

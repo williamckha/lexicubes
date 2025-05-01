@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { usePuzzleActions } from "~/game/puzzle-store";
 import { LoadingSpinner } from "~/components/ui/loading-spinner";
-import { UserDialog } from "~/user/login-dialog";
+import { UserDialog } from "~/user/user-dialog";
 import { useUserQuery } from "~/user/user-queries";
 import { LeaderboardDialog } from "~/leaderboard/leaderboard-dialog";
 import { AboutDialog } from "~/about/about-page";

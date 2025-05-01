@@ -63,7 +63,7 @@ function LeaderboardTable({ puzzleId }: { puzzleId: number }) {
 
   return (
     <div>
-      <table className="border-2">
+      <table className="w-full border-2">
         <thead className="bg-muted">
           <tr className="border-b-1 *:py-2">
             <th className="pl-3" />
