@@ -68,7 +68,7 @@ export function WordList({ puzzle }: WordListProps) {
       <CheckboxWithLabel
         checked={showSomeLetters}
         onCheckedChange={(e) => setShowSomeLetters(e === true)}
-        disabled={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
+        hidden={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
         label="Show some letters"
         description="Show some letters of the missing words. Shorter words show only the first letter, while
                      longer words may reveal the first two and occasionally some ending letters."

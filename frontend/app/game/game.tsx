@@ -29,7 +29,7 @@ export function Game({ puzzle }: GameProps) {
   return (
     <>
       {isWordListPaneVisible && (
-        <div className="flex flex-1 flex-col overflow-y-scroll my-10">
+        <div className="flex flex-1 flex-col overflow-y-scroll my-10 pr-8">
           <WordList puzzle={puzzle} />
         </div>
       )}
