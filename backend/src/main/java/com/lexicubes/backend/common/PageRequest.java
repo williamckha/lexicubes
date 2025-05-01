@@ -33,7 +33,7 @@ public class PageRequest {
      * {@return the offset to be taken according to the underlying page and page size}
      */
     public int getOffset() {
-        return (pageNumber - 1) * pageSize;
+        return pageNumber * pageSize;
     }
 
     @Override

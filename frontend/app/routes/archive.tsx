@@ -1,4 +1,4 @@
-import { GamePage } from "~/pages/game-page";
+import { GamePage } from "~/game/game-page";
 import type { Route } from "./+types/archive";
 import { data } from "react-router";
 

@@ -1,4 +1,30 @@
-export function AboutPage() {
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import React from "react";
+
+export function AboutDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
+  return (
+    <Dialog {...props}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>About</DialogTitle>
+          <VisuallyHidden>
+            <DialogDescription>About the game</DialogDescription>
+          </VisuallyHidden>
+        </DialogHeader>
+        <AboutPage />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AboutPage() {
   return (
     <>
       <p>Lexicubes is a 3D word search game.</p>

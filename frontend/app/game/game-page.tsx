@@ -4,16 +4,6 @@ import { BiHelpCircle } from "react-icons/bi";
 import { IoShareSocialSharp } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdLeaderboard } from "react-icons/md";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
-import { AboutPage } from "~/pages/about-page";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import React, { useState } from "react";
 import {
   DropdownMenu,
@@ -25,6 +15,8 @@ import { usePuzzleActions } from "~/game/puzzle-store";
 import { LoadingSpinner } from "~/components/ui/loading-spinner";
 import { UserDialog } from "~/user/login-dialog";
 import { useUserQuery } from "~/user/user-queries";
+import { LeaderboardDialog } from "~/leaderboard/leaderboard-dialog";
+import { AboutDialog } from "~/about/about-page";
 
 interface GamePageProps {
   puzzleId: PuzzleQueryId;
@@ -38,6 +30,8 @@ export function GamePage({ puzzleId }: GamePageProps) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+  const [isLeaderboardDialogOpen, setIsLeaderboardDialogOpen] = useState(false);
+  const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false);
 
   if (puzzleQuery.isPending) {
     return (
@@ -83,28 +77,15 @@ export function GamePage({ puzzleId }: GamePageProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <HeaderButton>
+            <HeaderButton onClick={() => setIsLeaderboardDialogOpen(true)}>
               <MdLeaderboard size={28} />
             </HeaderButton>
           </div>
           <h1 className="flex-1 text-xl font-semibold text-center">Lexicubes</h1>
           <div className="flex flex-1 justify-end items-center">
-            <Dialog>
-              <DialogTrigger>
-                <HeaderButton>
-                  <BiHelpCircle size={28} />
-                </HeaderButton>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>About</DialogTitle>
-                  <VisuallyHidden>
-                    <DialogDescription>About the game</DialogDescription>
-                  </VisuallyHidden>
-                </DialogHeader>
-                <AboutPage />
-              </DialogContent>
-            </Dialog>
+            <HeaderButton onClick={() => setIsAboutDialogOpen(true)}>
+              <BiHelpCircle size={28} />
+            </HeaderButton>
             <HeaderButton>
               <IoShareSocialSharp size={28} />
             </HeaderButton>
@@ -119,10 +100,18 @@ export function GamePage({ puzzleId }: GamePageProps) {
       </main>
 
       <UserDialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen} />
+
+      <LeaderboardDialog
+        puzzleId={puzzleQuery.data.id}
+        open={isLeaderboardDialogOpen}
+        onOpenChange={setIsLeaderboardDialogOpen}
+      />
+
+      <AboutDialog open={isAboutDialogOpen} onOpenChange={setIsAboutDialogOpen} />
     </div>
   );
 }
 
-function HeaderButton({ children }: React.PropsWithChildren) {
-  return <div className="hover:bg-white/30 px-2 py-3 cursor-pointer">{children}</div>;
+function HeaderButton({ ...props }: React.ComponentProps<"button">) {
+  return <button className="hover:bg-white/30 px-2 py-3 cursor-pointer" {...props} />;
 }

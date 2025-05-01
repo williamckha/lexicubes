@@ -12,9 +12,9 @@ public interface ScoreRepository extends CrudRepository<Score, Long> {
     Optional<Score> findScoreByPuzzleIdAndUserId(Long puzzleId, Long userId);
 
     @Query(""" 
-            SELECT s.id,
-                   u.id,
-                   u.name,
+            SELECT s.id AS score_id,
+                   u.id AS user_id,
+                   u.name AS user_name,
                    s.num_points,
                    s.num_required_words_found,
                    s.num_bonus_words_found
@@ -30,9 +30,9 @@ public interface ScoreRepository extends CrudRepository<Score, Long> {
     List<ScoreWithUser> findScoresWithUsersByPuzzleIdOrderByNumPoints(Long puzzleId, int offset, int limit);
 
     @Query(""" 
-            SELECT s.id,
-                   u.id,
-                   u.name,
+            SELECT s.id AS score_id,
+                   u.id AS user_id,
+                   u.name AS user_name,
                    s.num_points,
                    s.num_required_words_found,
                    s.num_bonus_words_found
@@ -48,9 +48,9 @@ public interface ScoreRepository extends CrudRepository<Score, Long> {
     List<ScoreWithUser> findScoresWithUsersByPuzzleIdOrderByNumRequiredWordsFound(Long puzzleId, int offset, int limit);
 
     @Query(""" 
-            SELECT s.id,
-                   u.id,
-                   u.name,
+            SELECT s.id AS score_id,
+                   u.id AS user_id,
+                   u.name AS user_name,
                    s.num_points,
                    s.num_required_words_found,
                    s.num_bonus_words_found
