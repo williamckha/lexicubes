@@ -11,6 +11,7 @@ import { useLeaderboardQuery } from "~/leaderboard/leaderboard-queries";
 import { LoadingSpinner } from "~/components/ui/loading-spinner";
 import { useUserQuery } from "~/user/user-queries";
 import { useInView } from "react-intersection-observer";
+import { Button } from "~/components/ui/button";
 
 export function LeaderboardDialog({
   puzzleId,
@@ -54,15 +55,22 @@ function LeaderboardTable({ puzzleId }: { puzzleId: number }) {
   }, [inView, hasNextPage, fetchNextPage]);
 
   if (isPending) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex justify-center items-center m-8">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (isError) {
     return null;
   }
 
+  const isLeaderboardEmpty =
+    leaderboard.pages.length === 0 || leaderboard.pages[0].totalPageCount === 0;
+
   return (
-    <div>
+    <>
       <table className="w-full border-2">
         <thead className="bg-muted">
           <tr className="border-b-1 *:py-2">
@@ -93,16 +101,23 @@ function LeaderboardTable({ puzzleId }: { puzzleId: number }) {
               })}
             </React.Fragment>
           ))}
+          {isLeaderboardEmpty && (
+            <tr>
+              <td colSpan={5} className="text-center p-4">
+                No leaderboard entries
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-      <button
+      <Button
         ref={inViewRef}
         onClick={() => fetchNextPage()}
         disabled={isFetchingNextPage || !hasNextPage}
         hidden={!hasNextPage}
       >
         {isFetchingNextPage ? "Loading..." : "Load next page"}
-      </button>
-    </div>
+      </Button>
+    </>
   );
 }

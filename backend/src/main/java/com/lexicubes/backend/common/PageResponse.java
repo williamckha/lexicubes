@@ -27,7 +27,7 @@ public class PageResponse<T> {
         this.totalPageCount = totalPageCount;
 
         isFirstPage = pageNumber == 0;
-        isLastPage = pageNumber == totalPageCount - 1;
+        isLastPage = pageNumber == totalPageCount - 1 || totalPageCount == 0;
     }
 
     public List<T> getItems() {

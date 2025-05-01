@@ -47,10 +47,10 @@ export function DeleteUserDialog({
           Are you sure you want to permanently delete this account? You will lose all history and
           stats associated with this account.
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <p>Type "delete" to confirm:</p>
           <input
-            className="flex-1 border-b-1 focus:border-b-2 transition-[border] py-1 outline-none  "
+            className="flex-1 border-b-1 focus:border-b-2 transition-[border] py-1 outline-none"
             type="text"
             placeholder="delete"
             value={deleteConfirmationText}
