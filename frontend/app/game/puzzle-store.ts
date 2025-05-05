@@ -329,8 +329,8 @@ export const usePuzzleBonusWordsFound = (puzzleId: number) =>
 export const usePuzzleRemovedCubes = (puzzleId: number) =>
   usePuzzleStore(useShallow((state) => state.puzzles[puzzleId]?.removedCubes ?? []));
 
-export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number, faceId: number) =>
-  usePuzzleStore((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace[faceId] ?? 0);
+export const usePuzzleNumRemainingWordsIncludingFace = (puzzleId: number) =>
+  usePuzzleStore((state) => state.puzzles[puzzleId]?.numRemainingWordsIncludingFace ?? []);
 
 export const usePuzzleScore = (puzzleId: number) =>
   usePuzzleStore((state) => {

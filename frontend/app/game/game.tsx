@@ -1,5 +1,4 @@
 import { WordInfo } from "~/game/word-info";
-import { Cubes } from "~/game/cubes";
 import { ScoreInfo } from "~/game/score-info";
 import {
   Dialog,
@@ -12,8 +11,15 @@ import { WordList } from "~/game/word-list";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useState } from "react";
 import type { Puzzle } from "~/game/puzzle-queries";
-import { usePuzzleActions } from "~/game/puzzle-store";
+import {
+  usePuzzleActions,
+  usePuzzleBonusWordsFound,
+  usePuzzleRequiredWordsFound,
+  usePuzzleScore,
+} from "~/game/puzzle-store";
 import { useWindowSize } from "@uidotdev/usehooks";
+import { PuzzleCubes } from "~/game/puzzle-cubes";
+import { PERK_SCORES } from "~/game/game-constants";
 
 export interface GameProps {
   puzzle: Puzzle;
@@ -23,31 +29,55 @@ export function Game({ puzzle }: GameProps) {
   const { initializePuzzleStateIfAbsent } = usePuzzleActions();
   initializePuzzleStateIfAbsent(puzzle);
 
+  const puzzleScore = usePuzzleScore(puzzle.id);
+  const requiredWordsFound = usePuzzleRequiredWordsFound(puzzle.id);
+  const bonusWordsFound = usePuzzleBonusWordsFound(puzzle.id);
+  const requiredWords = puzzle.solutions.filter((sol) => !sol.isBonus);
+
   const { isWordListDialogVisible, isWordListPaneVisible, toggleWordListVisibility } =
     useWordListVisibility();
+
+  const wordList = (
+    <WordList
+      words={puzzle.solutions.map((sol) => {
+        return {
+          word: sol.word,
+          found: requiredWordsFound.includes(sol.word) || bonusWordsFound.includes(sol.word),
+          isBonus: sol.isBonus,
+        };
+      })}
+      showSomeLettersUnlocked={puzzleScore >= PERK_SCORES.SHOW_SOME_LETTERS}
+    />
+  );
 
   return (
     <>
       {isWordListPaneVisible && (
-        <div className="flex flex-1 flex-col overflow-y-scroll my-10 pr-8">
-          <WordList puzzle={puzzle} />
-        </div>
+        <div className="flex flex-1 flex-col overflow-y-scroll my-10 pr-8">{wordList}</div>
       )}
+
+      <Dialog open={isWordListDialogVisible} onOpenChange={toggleWordListVisibility}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Words</DialogTitle>
+            <VisuallyHidden>
+              <DialogDescription>Word list for the current puzzle</DialogDescription>
+            </VisuallyHidden>
+          </DialogHeader>
+          {wordList}
+        </DialogContent>
+      </Dialog>
+
       <div className="flex flex-1 self-center items-center flex-col gap-2 short:gap-3 tall:gap-4">
-        <ScoreInfo puzzle={puzzle} onWordCountClick={toggleWordListVisibility} />
+        <ScoreInfo
+          score={puzzleScore}
+          requiredWordsFound={requiredWordsFound.length}
+          requiredWordsTotal={requiredWords.length}
+          bonusWordsFound={bonusWordsFound.length}
+          onWordCountClick={toggleWordListVisibility}
+        />
         <WordInfo />
-        <Cubes puzzle={puzzle} />
-        <Dialog open={isWordListDialogVisible} onOpenChange={toggleWordListVisibility}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Words</DialogTitle>
-              <VisuallyHidden>
-                <DialogDescription>Word list for the current puzzle</DialogDescription>
-              </VisuallyHidden>
-            </DialogHeader>
-            <WordList puzzle={puzzle} />
-          </DialogContent>
-        </Dialog>
+        <PuzzleCubes puzzle={puzzle} />
       </div>
     </>
   );

@@ -1,34 +1,20 @@
-import {
-  usePuzzleBonusWordsFound,
-  usePuzzleRequiredWordsFound,
-  usePuzzleScore,
-} from "~/game/puzzle-store";
 import { useState } from "react";
 import { CheckboxWithLabel } from "~/components/ui/checkbox";
-import type { Puzzle } from "~/game/puzzle-queries";
-import { PERK_SCORES } from "~/game/game-constants";
 
-export interface WordListProps {
-  puzzle: Puzzle;
+export interface WordListEntry {
+  word: string;
+  found: boolean;
+  isBonus: boolean;
 }
 
-export function WordList({ puzzle }: WordListProps) {
-  const requiredWordsFound = usePuzzleRequiredWordsFound(puzzle.id);
-  const bonusWordsFound = usePuzzleBonusWordsFound(puzzle.id);
-  const puzzleScore = usePuzzleScore(puzzle.id);
+export interface WordListProps {
+  words: WordListEntry[];
+  showSomeLettersUnlocked: boolean;
+}
 
+export function WordList({ words, showSomeLettersUnlocked }: WordListProps) {
   const [sortWordsAlphabetically, setSortWordsAlphabetically] = useState(false);
   const [showSomeLetters, setShowSomeLetters] = useState(false);
-
-  const allWords = puzzle.solutions.map((sol) => {
-    return {
-      word: sol.word,
-      found: requiredWordsFound.includes(sol.word) || bonusWordsFound.includes(sol.word),
-      isBonus: sol.isBonus,
-    };
-  });
-
-  type WordListEntry = (typeof allWords)[number];
 
   const wordComparator = (wordA: WordListEntry, wordB: WordListEntry): number => {
     if (!sortWordsAlphabetically && wordA.found !== wordB.found) {
@@ -38,7 +24,7 @@ export function WordList({ puzzle }: WordListProps) {
     return wordA.word.localeCompare(wordB.word);
   };
 
-  const allRequiredWordsGroupedByLength = allWords
+  const allRequiredWordsGroupedByLength = words
     .filter((word) => !word.isBonus)
     .reduce((groups: Record<number, WordListEntry[]>, word) => {
       groups[word.word.length] = groups[word.word.length] ?? [];
@@ -46,7 +32,7 @@ export function WordList({ puzzle }: WordListProps) {
       return groups;
     }, {});
 
-  const allBonusWords = allWords.filter((word) => word.isBonus).sort(wordComparator);
+  const allBonusWords = words.filter((word) => word.isBonus).sort(wordComparator);
 
   const getNumWordsLeftString = (words: WordListEntry[]) => {
     const numWordsLeft = words.length - words.filter((word) => word.found).length;
@@ -59,7 +45,7 @@ export function WordList({ puzzle }: WordListProps) {
 
       <CheckboxWithLabel
         checked={sortWordsAlphabetically}
-        onCheckedChange={(e) => setSortWordsAlphabetically(e === true)}
+        onCheckedChange={(checked) => setSortWordsAlphabetically(checked === true)}
         label="Sort words alphabetically"
         description="Shows all missing words in the word list, sorted alphabetically alongside the words
                      you've already found, so you know where to look next."
@@ -67,8 +53,8 @@ export function WordList({ puzzle }: WordListProps) {
 
       <CheckboxWithLabel
         checked={showSomeLetters}
-        onCheckedChange={(e) => setShowSomeLetters(e === true)}
-        hidden={puzzleScore < PERK_SCORES.SHOW_SOME_LETTERS}
+        onCheckedChange={(checked) => setShowSomeLetters(checked === true)}
+        hidden={!showSomeLettersUnlocked}
         label="Show some letters"
         description="Show some letters of the missing words. Shorter words show only the first letter, while
                      longer words may reveal the first two and occasionally some ending letters."
