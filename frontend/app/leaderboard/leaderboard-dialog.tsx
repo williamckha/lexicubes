@@ -71,14 +71,14 @@ function LeaderboardTable({ puzzleId }: { puzzleId: number }) {
 
   return (
     <>
-      <table className="w-full border-2">
+      <table className="w-full border-2 *:text-sm *:sm:text-base">
         <thead className="bg-muted">
-          <tr className="border-b-1 *:py-2">
-            <th className="pl-3" />
-            <th className="px-3 font-semibold text-left">Name</th>
-            <th className="px-3 font-semibold text-right">Score</th>
-            <th className="px-3 font-semibold text-right">Words</th>
-            <th className="px-3 font-semibold text-right">Bonus</th>
+          <tr className="border-b-1 *:py-2 *:px-2 sm:*:px-3">
+            <th className="!pr-0" />
+            <th className="font-semibold text-left">Name</th>
+            <th className="font-semibold text-right">Score</th>
+            <th className="font-semibold text-right">Words</th>
+            <th className="font-semibold text-right">Bonus</th>
           </tr>
         </thead>
         <tbody>
@@ -88,14 +88,14 @@ function LeaderboardTable({ puzzleId }: { puzzleId: number }) {
                 const position = page.pageSize * page.pageNumber + index + 1;
                 const rowColor = user?.id === item.userId ? "bg-accent-secondary/10" : "";
                 return (
-                  <tr key={item.userId} className={`border-b-1 *:py-2 ${rowColor}`}>
-                    <td className="pl-3 font-semibold text-right">{position}.</td>
-                    <td className="px-3 w-full max-w-0 text-left overflow-hidden text-ellipsis text-nowrap">
+                  <tr key={item.userId} className={`border-b-1 *:py-2 *:px-2 sm:*:px-3 ${rowColor}`}>
+                    <td className="!pr-0 font-semibold text-right">{position}.</td>
+                    <td className="w-full max-w-0 text-left overflow-hidden text-ellipsis text-nowrap">
                       {item.userName}
                     </td>
-                    <td className="px-3 text-right">{item.numPoints}</td>
-                    <td className="px-3 text-right">{item.numRequiredWordsFound}</td>
-                    <td className="px-3 text-right">{item.numBonusWordsFound}</td>
+                    <td className="text-right">{item.numPoints}</td>
+                    <td className="text-right">{item.numRequiredWordsFound}</td>
+                    <td className="text-right">{item.numBonusWordsFound}</td>
                   </tr>
                 );
               })}
