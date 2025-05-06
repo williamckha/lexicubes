@@ -32,11 +32,11 @@ export function WordList({ words, showSomeLettersUnlocked }: WordListProps) {
       return groups;
     }, {});
 
-  const allBonusWords = words.filter((word) => word.isBonus).sort(wordComparator);
+  const bonusWords = words.filter((word) => word.isBonus && word.found).sort(wordComparator);
 
   const getNumWordsLeftString = (words: WordListEntry[]) => {
     const numWordsLeft = words.length - words.filter((word) => word.found).length;
-    return `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
+    return numWordsLeft === 0 ? null : `+${numWordsLeft} word${numWordsLeft === 1 ? "" : "s"} left`;
   };
 
   return (
@@ -47,8 +47,8 @@ export function WordList({ words, showSomeLettersUnlocked }: WordListProps) {
         checked={sortWordsAlphabetically}
         onCheckedChange={(checked) => setSortWordsAlphabetically(checked === true)}
         label="Sort words alphabetically"
-        description="Shows all missing words in the word list, sorted alphabetically alongside the words
-                     you've already found, so you know where to look next."
+        description="Sorts the word list alphabetically, revealing where all the missing words are relative
+                     to the ones you've already found."
       />
 
       <CheckboxWithLabel
@@ -76,7 +76,9 @@ export function WordList({ words, showSomeLettersUnlocked }: WordListProps) {
                 ))}
             </div>
             {!sortWordsAlphabetically && !showSomeLetters && (
-              <span className="text-sm text-muted-foreground">{getNumWordsLeftString(words)}</span>
+              <span className="empty:hidden text-sm text-muted-foreground">
+                {getNumWordsLeftString(words)}
+              </span>
             )}
           </div>
         ))}
@@ -84,17 +86,15 @@ export function WordList({ words, showSomeLettersUnlocked }: WordListProps) {
       <div className="flex flex-col gap-4">
         <h2>Bonus words</h2>
         <div className="flex flex-wrap gap-x-3 gap-y-1 empty:hidden">
-          {allBonusWords
-            .filter(({ found }) => found)
-            .map(({ word }) => (
-              <span key={word} className="text-lg">
-                {word}
-              </span>
-            ))}
+          {bonusWords.map(({ word }) => (
+            <span key={word} className="text-lg">
+              {word}
+            </span>
+          ))}
         </div>
-        <span className="text-sm text-muted-foreground">
-          {getNumWordsLeftString(allBonusWords)}
-        </span>
+        {bonusWords.length === 0 && (
+          <span className="text-sm text-muted-foreground">None found so far</span>
+        )}
       </div>
     </div>
   );
