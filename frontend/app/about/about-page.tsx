@@ -7,6 +7,7 @@ import {
 } from "~/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import React from "react";
+import { GameplayExample } from "~/about/gameplay-example";
 
 export function AboutDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
   return (
@@ -26,14 +27,15 @@ export function AboutDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
 
 function AboutPage() {
   return (
-    <>
-      <p>Lexicubes is a 3D word search game.</p>
+    <div className="flex flex-col gap-4">
+      <p>Lexicubes is a pseudo-3D word search game.</p>
       <p>A new puzzle is released every day at midnight.</p>
       <h2>How to play</h2>
       <p>
         Form words by <b>connecting letters</b> on neighbouring faces. Two faces are neighbours if
         they share an edge or corner.
       </p>
+      <GameplayExample />
       <p>
         Cubes will be removed once you've found all the words using them, revealing more faces
         underneath. Only faces that are fully visible are in play. Try to clear all the cubes!
@@ -50,12 +52,12 @@ function AboutPage() {
         cubes in a certain way. They don't count towards your score, but they do show up on the
         leaderboard.
       </p>
-      <h2>Scoring explained</h2>
+      <h2>Unlocking hints</h2>
       <p>
-        As you find words and gain points, you'll unlock different perks that can help you complete
+        As you find words and gain points, you'll unlock different hints that can help you complete
         the puzzle. Longer words are worth more points. The <b>star</b> in the progress bar shows
-        you how far away you are from unlocking the next perk.
+        you how far away you are from unlocking the next hint.
       </p>
-    </>
+    </div>
   );
 }

@@ -53,7 +53,7 @@ function DialogContent({
         onOpenAutoFocus={(e) => e.preventDefault()}
         {...props}
       >
-        <div className="flex flex-1 flex-col gap-4 p-6 overflow-y-auto mt-12">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 px-6 pb-6 overflow-y-auto mt-18">{children}</div>
         <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-6 right-6 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-6">
           <XIcon />
           <span className="sr-only">Close</span>
@@ -77,7 +77,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("!text-3xl leading-none font-semibold mb-2", className)}
+      className={cn("!text-3xl leading-none font-semibold", className)}
       {...props}
     />
   );
