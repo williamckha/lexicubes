@@ -71,9 +71,7 @@ export function GamePage({ puzzleId }: GamePageProps) {
                     setIsMenuOpen(false);
                   }}
                 >
-                  {userQuery.isPending || userQuery.isError || userQuery.data === null
-                    ? "Log in"
-                    : "Account"}
+                  {userQuery.isPending || userQuery.isError ? "Log in" : "Account"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

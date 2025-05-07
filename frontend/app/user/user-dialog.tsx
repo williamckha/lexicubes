@@ -29,7 +29,7 @@ export function UserDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
     return null;
   }
 
-  if (isError || user === null) {
+  if (isError) {
     return <LoginDialog {...props} />;
   }
 
@@ -79,8 +79,6 @@ function LoginDialog({ ...props }: React.ComponentProps<typeof Dialog>) {
         </DialogHeader>
         <p>Log in to save your progress and share your score on the leaderboard.</p>
         <GoogleLoginButton />
-        <AppleLoginButton />
-        <FacebookLoginButton />
         <GitHubLoginButton />
       </DialogContent>
     </Dialog>

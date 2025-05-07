@@ -7,14 +7,10 @@ export interface User {
   provider: "google" | "apple" | "facebook" | "github";
 }
 
-async function fetchUser(): Promise<User | null> {
+async function fetchUser(): Promise<User> {
   const response = await fetch("/api/user", {
     method: "GET",
   });
-
-  if (response.status === 401) {
-    return null;
-  }
 
   if (!response.ok) {
     const text = await response.text();
