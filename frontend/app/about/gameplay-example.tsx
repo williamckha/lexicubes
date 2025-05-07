@@ -1,28 +1,31 @@
 import React, { useRef } from "react";
-import { useAnimateProp } from "~/lib/use-animate-prop";
+import { useAnimatedState } from "~/lib/use-animated-state";
 import { Cube } from "~/game/cube";
+import { Easing } from "~/lib/tween";
 
 const CUBE_SIZE_PX = 40;
 
 const WORD_LIST = ["MUSIC", "PUNK", "SICK", "PUNS", "EPIC"];
 
-const SELECTION_ANIMATION_DURATION = 800;
-const STILL_ANIMATION_DURATION = 1200;
-const TOTAL_ANIMATION_DURATION = SELECTION_ANIMATION_DURATION + STILL_ANIMATION_DURATION;
-const SELECTION_ANIMATION_PERCENTAGE = SELECTION_ANIMATION_DURATION / TOTAL_ANIMATION_DURATION;
+const SELECTION_ANIMATION_DURATION_MS = 800;
+const STILL_ANIMATION_DURATION_MS = 1200;
+const TOTAL_ANIMATION_DURATION_MS = SELECTION_ANIMATION_DURATION_MS + STILL_ANIMATION_DURATION_MS;
+const SELECTION_ANIMATION_PERCENTAGE =
+  SELECTION_ANIMATION_DURATION_MS / TOTAL_ANIMATION_DURATION_MS;
 
 export function GameplayExample() {
   const currentWordIndexRef = useRef(0);
 
-  const isFaceHighlighted = useAnimateProp({
-    durationMs: TOTAL_ANIMATION_DURATION,
+  const isFaceHighlighted = useAnimatedState({
+    durationMs: TOTAL_ANIMATION_DURATION_MS,
+    easing: Easing.Linear,
     repeat: true,
-    onProgress: (progress) => {
-      const isFaceHighlighted: { [key: string]: boolean } = {};
+    onProgress: (value) => {
+      const isFaceHighlighted: Record<string, boolean> = {};
       const word = WORD_LIST[currentWordIndexRef.current];
       for (let i = 1; i <= word.length; i++) {
         const threshold = (i / word.length) * SELECTION_ANIMATION_PERCENTAGE;
-        isFaceHighlighted[word.charAt(i - 1)] = progress >= threshold;
+        isFaceHighlighted[word.charAt(i - 1)] = value >= threshold;
       }
       return isFaceHighlighted;
     },
