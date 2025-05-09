@@ -22,6 +22,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation(platform("com.google.cloud:spring-cloud-gcp-dependencies:6.1.1"))
+    implementation("com.google.cloud:spring-cloud-gcp-starter-secretmanager")
     implementation("org.liquibase:liquibase-core")
     implementation("org.jetbrains:annotations:26.0.2")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")

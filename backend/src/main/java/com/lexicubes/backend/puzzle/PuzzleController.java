@@ -53,7 +53,7 @@ public class PuzzleController {
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
     }
 
-    @PutMapping("/api/puzzles/daily/{date}")
+    @PutMapping("/api/admin/puzzles/daily/{date}")
     public ResponseEntity<?> generateDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         final Puzzle puzzle = puzzleGenerator.generateAndSaveDailyPuzzle(date);
 

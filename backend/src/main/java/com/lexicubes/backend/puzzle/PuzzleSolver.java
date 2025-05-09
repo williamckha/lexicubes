@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
 @Service
 public class PuzzleSolver {
 
-    private static final String WORDS_LIST_RESOURCE_NAME = "wordlists\\common.txt";
+    private static final String WORD_LIST_RESOURCE_NAME = "wordlists/common.txt";
 
     /**
      * The root node of a trie storing the dictionary of valid words.
@@ -327,8 +328,8 @@ public class PuzzleSolver {
     }
 
     private void loadWordTrie() {
-        try (final Stream<String> lines = Files.lines(
-                Path.of(ClassLoader.getSystemResource(WORDS_LIST_RESOURCE_NAME).toURI()))) {
+        final URL wordList = getClass().getClassLoader().getResource(WORD_LIST_RESOURCE_NAME);
+        try (final Stream<String> lines = Files.lines(Path.of(Objects.requireNonNull(wordList).toURI()))) {
             lines.forEach(wordTrie::insert);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
