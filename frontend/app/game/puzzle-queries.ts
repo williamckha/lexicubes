@@ -49,7 +49,8 @@ export function usePuzzleQuery(puzzleId: PuzzleQueryId) {
 
 async function fetchPuzzle(puzzleId: PuzzleQueryId): Promise<Puzzle> {
   const url =
-    "/api/puzzles/" + (puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId);
+    `${import.meta.env.VITE_BACKEND_API_URL}/api/puzzles/` +
+    (puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId);
 
   const response = await fetch(url);
 

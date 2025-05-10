@@ -8,7 +8,7 @@ export interface User {
 }
 
 async function fetchUser(): Promise<User> {
-  const response = await fetch("/api/user", {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/user`, {
     method: "GET",
   });
 
@@ -21,7 +21,7 @@ async function fetchUser(): Promise<User> {
 }
 
 async function deleteUser() {
-  const response = await fetch(`/api/user`, {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/user`, {
     method: "DELETE",
   });
 

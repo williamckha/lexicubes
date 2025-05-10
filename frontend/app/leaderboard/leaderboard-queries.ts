@@ -21,9 +21,12 @@ async function fetchLeaderboard(
   puzzleId: number,
   page: number = 0,
 ): Promise<Page<LeaderboardEntry>> {
-  const response = await fetch(`/api/puzzles/${puzzleId}/leaderboard?page=${page}`, {
-    method: "GET",
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND_API_URL}/api/puzzles/${puzzleId}/leaderboard?page=${page}`,
+    {
+      method: "GET",
+    },
+  );
 
   if (!response.ok) {
     const text = await response.text();

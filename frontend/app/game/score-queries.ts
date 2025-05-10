@@ -13,11 +13,14 @@ interface SubmitScoreRequest {
 async function submitScore(request: SubmitScoreRequest) {
   const { puzzleId, ...requestBody } = request;
 
-  const response = await fetch(`/api/puzzles/${puzzleId}/score`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(requestBody),
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND_API_URL}/api/puzzles/${puzzleId}/score`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    },
+  );
 
   if (!response.ok) {
     const text = await response.text();
