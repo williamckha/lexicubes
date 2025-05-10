@@ -6,15 +6,24 @@ on:
       - master
     paths:
       - frontend/**
+      - .github/workflows/deploy-prod.yaml
 
 jobs:
   deploy_live_website:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create env file
+        working-directory: frontend
+        run: |
+          touch .env.production
+          echo VITE_BACKEND_API_URL=${{ vars.BACKEND_API_URL }} >> .env.production
+
       - name: Build website
         working-directory: frontend
         run: npm ci && npm run build
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LEXICUBES }}"
