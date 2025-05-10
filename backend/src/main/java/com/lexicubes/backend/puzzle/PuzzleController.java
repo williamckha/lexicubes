@@ -4,7 +4,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -53,9 +53,9 @@ public class PuzzleController {
         return PuzzleMapper.toPuzzleResponse(puzzle.get(), solutions);
     }
 
-    @PutMapping("/api/admin/puzzles/daily/{date}")
-    public ResponseEntity<?> generateDailyPuzzle(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        final Puzzle puzzle = puzzleGenerator.generateAndSaveDailyPuzzle(date);
+    @PostMapping("/api/admin/puzzles/daily")
+    public ResponseEntity<?> generateDailyPuzzle() {
+        final Puzzle puzzle = puzzleGenerator.generateAndSaveDailyPuzzle();
 
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()

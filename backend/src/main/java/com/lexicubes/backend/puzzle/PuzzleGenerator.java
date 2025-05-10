@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,10 @@ public class PuzzleGenerator {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Puzzle generateAndSaveDailyPuzzle(LocalDate date) {
+    public Puzzle generateAndSaveDailyPuzzle() {
+        final ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC+14:00"));
+        final LocalDate date = currentTime.plusHours(1).toLocalDate();
+
         final Optional<Puzzle> existingPuzzle = puzzleRepository.findDailyByPublishedDate(date);
         return existingPuzzle.orElseGet(() -> puzzleRepository.save(Puzzle.of(date, true, generatePyramidPuzzleCubes(3))));
     }
