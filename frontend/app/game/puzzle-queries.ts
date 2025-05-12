@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { getISODate } from "~/lib/date-utils";
 
 export interface Puzzle {
   id: number;
@@ -48,11 +49,10 @@ export function usePuzzleQuery(puzzleId: PuzzleQueryId) {
 }
 
 async function fetchPuzzle(puzzleId: PuzzleQueryId): Promise<Puzzle> {
-  const url =
+  const response = await fetch(
     `${import.meta.env.VITE_BACKEND_API_URL}/api/puzzles/` +
-    (puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId);
-
-  const response = await fetch(url);
+      (puzzleId === "daily" ? `daily/${getISODate(new Date())}` : puzzleId),
+  );
 
   if (!response.ok) {
     const text = await response.text();

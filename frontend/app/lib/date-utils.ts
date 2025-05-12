@@ -1,3 +1,9 @@
-function getISODate(date: Date): string {
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+export function getISODate(date: Date): string {
+  return (
+    date.getFullYear().toString() +
+    "-" +
+    (date.getMonth() + 1).toString().padStart(2, "0") +
+    "-" +
+    date.getDate().toString().padStart(2, "0")
+  );
 }
