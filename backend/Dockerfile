@@ -1,29 +1,20 @@
-FROM gradle:jdk21-alpine AS build
+FROM ghcr.io/graalvm/native-image-community:21 AS build
 WORKDIR /app
 
-COPY --chown=gradle:gradle build.gradle* settings.gradle* ./
-COPY --chown=gradle:gradle gradle ./gradle
-COPY --chown=gradle:gradle src ./src
+RUN microdnf install findutils
 
-RUN gradle dependencies --no-daemon
-RUN gradle bootJar --no-daemon
+COPY build.gradle* settings.gradle* gradlew ./
+COPY gradle ./gradle
+COPY src ./src
 
-# Unpack the jar file
-RUN mkdir -p build/dependency && (cd build/dependency; echo $(ls -1 ../libs); jar -xf ../libs/*.jar)
+RUN chmod +x ./gradlew
+RUN ./gradlew nativeCompile
 
-FROM gcr.io/distroless/java21-debian12
+FROM oraclelinux:9-slim
 WORKDIR /app
-USER nonroot
 
-ARG DEPENDENCY=/app/build/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+COPY --from=build /app/build/native/nativeCompile/backend /app/application
 
 EXPOSE 8080
 
-ENTRYPOINT [                                    \
-    "java", "-cp", "/app:/app/lib/*",           \
-    "-Dspring.profiles.active=prod",            \
-    "com.lexicubes.backend.BackendApplication"  \
-]
+ENTRYPOINT ["/app/application", "-Dspring.profiles.active=prod"]

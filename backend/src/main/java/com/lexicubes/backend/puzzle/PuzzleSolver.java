@@ -3,19 +3,17 @@ package com.lexicubes.backend.puzzle;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class PuzzleSolver {
 
-    private static final String WORD_LIST_RESOURCE_NAME = "wordlists/common.txt";
+    private static final String WORD_LIST_RESOURCE_NAME = "/wordlists/common.txt";
 
     /**
      * The root node of a trie storing the dictionary of valid words.
@@ -328,10 +326,11 @@ public class PuzzleSolver {
     }
 
     private void loadWordTrie() {
-        final URL wordList = getClass().getClassLoader().getResource(WORD_LIST_RESOURCE_NAME);
-        try (final Stream<String> lines = Files.lines(Path.of(Objects.requireNonNull(wordList).toURI()))) {
-            lines.forEach(wordTrie::insert);
-        } catch (IOException | URISyntaxException e) {
+        try (final InputStream inputStream = PuzzleSolver.class.getResourceAsStream(WORD_LIST_RESOURCE_NAME);
+             final InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(inputStream));
+             final BufferedReader reader = new BufferedReader(inputStreamReader)) {
+            reader.lines().forEach(wordTrie::insert);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

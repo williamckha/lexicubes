@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.graalvm.buildtools.native") version "0.10.6"
 }
 
 group = "com.lexicubes"
@@ -10,6 +11,20 @@ version = "0.0.1-SNAPSHOT"
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("backend")
+            buildArgs.add("--no-fallback")
+            buildArgs.add(
+                "--initialize-at-build-time=" +
+                        "org.apache.commons.logging.LogFactory," +
+                        "org.apache.commons.logging.LogFactoryService"
+            )
+        }
     }
 }
 
