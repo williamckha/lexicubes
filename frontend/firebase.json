@@ -8,6 +8,34 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "lexicubes",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/oauth2/**",
+        "run": {
+          "serviceId": "lexicubes",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/login/**",
+        "run": {
+          "serviceId": "lexicubes",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/logout/**",
+        "run": {
+          "serviceId": "lexicubes",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
