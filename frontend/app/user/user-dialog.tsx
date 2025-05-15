@@ -116,7 +116,7 @@ function GoogleLoginButton() {
     <SocialLoginButton
       icon={SOCIAL_PROVIDERS.google.icon}
       provider={SOCIAL_PROVIDERS.google.name}
-      href={`${import.meta.env.VITE_BACKEND_API_URL}/oauth2/authorization/google`}
+      href="/oauth2/authorization/google"
     />
   );
 }
@@ -126,7 +126,7 @@ function AppleLoginButton() {
     <SocialLoginButton
       icon={SOCIAL_PROVIDERS.apple.icon}
       provider={SOCIAL_PROVIDERS.apple.name}
-      href={`${import.meta.env.VITE_BACKEND_API_URL}/oauth2/authorization/apple`}
+      href="/oauth2/authorization/apple"
     />
   );
 }
@@ -136,7 +136,7 @@ function FacebookLoginButton() {
     <SocialLoginButton
       icon={SOCIAL_PROVIDERS.facebook.icon}
       provider={SOCIAL_PROVIDERS.facebook.name}
-      href={`${import.meta.env.VITE_BACKEND_API_URL}/oauth2/authorization/facebook`}
+      href="/oauth2/authorization/facebook"
     />
   );
 }
@@ -146,7 +146,7 @@ function GitHubLoginButton() {
     <SocialLoginButton
       icon={SOCIAL_PROVIDERS.github.icon}
       provider={SOCIAL_PROVIDERS.github.name}
-      href={`${import.meta.env.VITE_BACKEND_API_URL}/oauth2/authorization/github`}
+      href="/oauth2/authorization/github"
     />
   );
 }

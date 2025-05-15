@@ -34,13 +34,13 @@ public class GoogleAuthenticationFilter extends OncePerRequestFilter {
 
     private final GoogleIdTokenVerifier verifier;
 
-    public GoogleAuthenticationFilter(@Value("${app.backend.url}") String backendUrl)
+    public GoogleAuthenticationFilter(@Value("${app.base.url}") String baseUrl)
             throws GeneralSecurityException, IOException {
 
         verifier = new GoogleIdTokenVerifier.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance())
-                .setAudience(Collections.singletonList(backendUrl))
+                .setAudience(Collections.singletonList(baseUrl))
                 .build();
     }
 

@@ -22,11 +22,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,8 +29,8 @@ public class SecurityConfig {
 
     private final UserService userService;
 
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     @Autowired
     public SecurityConfig(UserService userService) {
@@ -47,7 +42,6 @@ public class SecurityConfig {
                                                    GoogleAuthenticationFilter googleAuthenticationFilter) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/user").authenticated()
                         .requestMatchers("/api/puzzles/*/score").authenticated()
@@ -59,26 +53,14 @@ public class SecurityConfig {
                                 .userService(oAuth2UserService())
                                 .oidcUserService(oidcUserService())
                         )
-                        .defaultSuccessUrl(frontendUrl, true)
+                        .defaultSuccessUrl(baseUrl, true)
                 )
-                .logout(logout -> logout
-                        .logoutSuccessUrl(frontendUrl)
-                )
+                .logout(logout -> logout.logoutSuccessUrl(baseUrl))
                 .addFilterAfter(googleAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 
     @Bean
